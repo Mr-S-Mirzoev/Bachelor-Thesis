@@ -204,7 +204,15 @@ e^{-r - c\xi} \expect*{e^{\xi Z(1)}|U(0) = u} = 1
 \proofref{thm:strict_convexity_m1}
 \end{proof}
 
-Учитывая утверждение выше, это уравнение имеет не более двух решений. На самом деле, она имеет ровно два решения: одно - $\xi_1 = 1$, так как ${e^{-rt} S(Т), t \ge 0}$ должно быть мартингалом; другое решение будет отрицательным, то есть для некоторого $R > 0$ будет иметь вид: $\xi_2 = -R < 0$, так как выражение в левой части - непрерывная функция от $\xi$, которая принимает значение $-r$ при $\xi = 0$ и стремится к $\infty$ при $\xi \to \infty$.
+Учитывая утверждение выше, это уравнение имеет не более двух решений. На самом деле, она имеет ровно два решения:
+\begin{theorem}[Решение уравнения \eqref{eq:martingale_cond_for_xi_log}]\label{thm:solution_for_mart_cond_m1}
+Уравнение \eqref{eq:martingale_cond_for_xi_log} имеет ровно два решения. \\
+Первое: $\xi_1 = 1$, \\
+Второе: $\xi_2 = -R < 0$, для некоторого $R > 0$
+\end{theorem}
+\begin{proof}
+\proofref{thm:solution_for_mart_cond_m1}
+\end{proof}
 
 Отметим, что положительный мартингал $e^{-rt} S(t)^{-R}$ ограничен сверху константой $L^{-R}$ при $t < T_L$. 
 
@@ -230,9 +238,6 @@ V(s; L) = \left(\frac{L}{s}\right)^{R} P(L), s \ge L.
 \bibitem{GerberShiu}
 Hans U. Gerber and Elias S.W. Shiu \textbf{"Pricing Perpetual Options for Jump Processes"} // --- North American Actuarial Journal, 1998 --- vol. 2, issue 3, 108-109 ---
 \end{thebibliography}
-
-\section{Модель}
-
 
 \section{Бесконечный колл-опцион}
 
@@ -322,8 +327,34 @@ e^{-r - c \xi} M_{Z(1)}(\xi) = 1
 \end{split}
 \end{equation*}
 
-Так как $\lambda > 0, x^2 \ge 0, e^{\xi x} > 0, p(x > 0) \neq 0$, выражение внутри строго положительно, как произведение положительной величины и матожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна.
+Так как $\lambda > 0, x^2 \ge 0, e^{\xi x} > 0, p(x > 0) \neq 0$, выражение внутри строго положительно, как произведение положительной величины и мат.ожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна. Попутно было доказано, что и первая производная монотонна (x > 0), а значит имеем дело с монотонной строго выпуклой функцией.
 
+\end{delayedproof}
+
+
+
+\begin{delayedproof}{thm:solution_for_mart_cond_m1}
+Обозначим функцию в левой части уравнения \eqref{eq:martingale_cond_for_xi_log} через $f(\xi)$:
+\begin{equation*}
+f(\xi) = \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi
+\end{equation*}
+
+Первое решение возникает, так как ${e^{-rt} S(Т), t \ge 0}$ должно быть мартингалом.
+
+Второе решение будет отрицательным, то есть для некоторого $R > 0$ будет иметь вид: $\xi_2 = -R < 0$.
+Это следует из того, что $f(0) = -r$ и $\lim_{\xi\to-\infty} f(\xi) = +\infty$:
+
+\begin{equation*}
+f(0) = \lambda \left(\int_{0}^{+\infty} e^{0} p(x) \,dx - 1\right) - r = \lambda (1 - 1) - r = -r
+\end{equation*}
+
+\begin{equation*}
+\begin{split}
+\lim_{\xi\to-\infty} f(\xi) &= \lim_{\xi\to-\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= - \lambda - r - c \xi &= +\infty
+\end{split}
+\end{equation*}
+
+А так как выражение в левой части - непрерывная монотонная функция от $\xi$, она принимает все значения лежащие в $[-R, +\infty)$ на $\xi \in (-\infty, 0]$
 \end{delayedproof}
 
 \begin{delayedproof}{thm:thm2_moment_generating_function}
