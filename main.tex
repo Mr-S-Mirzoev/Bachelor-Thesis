@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt]{article}
+ \documentclass[a4paper,12pt]{article}
 
 \usepackage{hyperref}
 \usepackage[affil-it]{authblk}
@@ -14,9 +14,13 @@
 \usepackage[english,russian]{babel}	% локализация и переносы
 \usepackage[utf8]{inputenc}
 
+% Footnotes
+\usepackage[bottom]{footmisc}
+
 % Математика
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
 
+\usepackage{physics}
 \usepackage[colorlinks]{hyperref}
 \usepackage{cleveref}
 
@@ -45,6 +49,21 @@
 \makeatletter
 % Roman numbers support
 \newcommand*{\rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
+
+% Expectation support
+\newcommand{\expect}{\operatorname{E}\expectarg}
+\DeclarePairedDelimiterX{\expectarg}[1]{[}{]}{%
+  \ifnum\currentgrouptype=16 \else\begingroup\fi
+  \activatebar#1
+  \ifnum\currentgrouptype=16 \else\endgroup\fi
+}
+
+\newcommand{\innermid}{\nonscript\;\delimsize\vert\nonscript\;}
+\newcommand{\activatebar}{%
+  \begingroup\lccode`\~=`\|
+  \lowercase{\endgroup\let~}\innermid 
+  \mathcode`|=\string"8000
+}
 
 \renewcommand\qedsymbol{$\blacksquare$}
 
@@ -101,7 +120,9 @@
 
 Модель \rom{2}: $U(t) = u + ct - Z(t)$
 
-В обоих случаях $c > 0$ является постоянной величиной, а $\{Z(t)\}$ представляет собой составной пуассоновский процесс, определяемый параметром $\lambda > 0$ и распределением величин скачка. Для упрощения обозначений предположим, что распределения величин скачка
+В обоих случаях $c > 0$ является постоянной величиной, а $\{Z(t)\}$ представляет собой составной пуассоновский процесс, определяемый параметром $\lambda > 0$ и распределением величин скачка. 
+
+\label{sec:positivityOfJumsAssumption} Для упрощения обозначений предположим, что распределения величин скачка
 непрерывны с плотностью вероятности $p(x), x \ge 0$. 
 
 \begin{theorem}[Отсутствие арбитража]\label{thm:no_arbitrage_theoreme}
@@ -112,6 +133,96 @@
 \end{proof}
 
 Обратите внимание, что модель \rom{2} напоминает модель, которая используется для процесса избытка в классической теории риска.
+
+Наша главная цель - оценить бессрочный американский
+опцион с функцией выплаты P(s). Хотя указание \textit{американский} не является обязательным, оно добавляется, чтобы подчеркнуть, что опцион может быть реализована в любое время.
+
+Если такой опцион будет реализован в момент времени $T$, выигрыш составит $P(S(T))$. Мы ограничиваемся опционами с функциями выплаты, для которых априори ясно, что оптимальными стратегиями исполнения будут времена остановки вида:
+
+\begin{equation}\label{eq:optimal_excersize}
+T_L = \inf\limits_{S(t) < L}{t},
+\end{equation}
+
+где граница исполнения опциона $L$ является положительной константой. Это, в частности, относится к бессрочному опциону "пут", где 
+\begin{equation}\label{eq:payoff_function}
+P(s) = \max(K - s, 0) = (K - s)_+,
+\end{equation}
+где $K$, обозначает цену исполнения. Проблема состоит в
+том, чтобы сначала найти стоимость стратегии $T_L$,
+
+\begin{equation}\label{eq:strategy_cost}
+V(s; L) = \expect*{e^{-rT_L} P(S(T_L)) | S(0) = s}, s \ge L,
+\end{equation}
+
+а затем определить оптимальное значение $\widetilde{L}$, которое
+максимизирует $V(s; L)$. Следовательно, $L$ - оптимальная граница опциона. Цена опциона равна:
+
+\begin{equation}\label{eq:option_price}
+    \begin{cases}
+      V(S(0); \widetilde{L}), \text{ if } S(0) \ge \widetilde{L}\\
+      P(S(0)), \text{ if } S(0) < \widetilde{L}
+    \end{cases}\,.
+\end{equation}
+
+\section{Решение для модели \rom{1}}
+
+Поскольку траектории процесса $\{S(t)\}$ не имеют
+скачков вниз, точная нижняя грань \eqref{eq:optimal_excersize} достигается на непрерывном участке траектории, а значит $S(T_L) = L$, и, следовательно, \eqref{eq:strategy_cost} получает вид:
+
+\begin{equation}\label{eq:strategy_c1}
+V(s; L) = \expect*{e^{-rT_L} | S(0) = s} P(L), s \ge L,
+\end{equation}
+
+Остается определить мат.ожидание. Для этой цели мы рассмотрим мартингал вида $\{e^{-rt}S(t)^{\xi}\}$. 
+\begin{theorem}[Мартингальное условие для $\xi$]\label{thm:martingale_cond_for_xi}
+Так как $e^{-rt}S(t)^{\xi} = e^{-rt + \xi U(t)}$ и ${U(t), t \ge 0}$ - процесс с независимыми и стационарными приращениями, условие мартингальности для $\xi$ при $t = 1$ \footnote{рассмотрение конкретной реализации процесса не сужает общность решаемой задачи} выглядит как:
+\begin{equation}\label{eq:martingale_cond_for_xi}
+e^{-r} \expect*{e^{\xi U(1)}|U(0) = u} = e ^ {\xi u}
+\end{equation}
+
+Равносильно:
+\begin{equation}\label{eq:martingale_cond_for_xi_alt}
+e^{-r - c\xi} \expect*{e^{\xi Z(1)}|U(0) = u} = 1
+\end{equation}
+
+Что приводит к:
+\begin{equation}\label{eq:martingale_cond_for_xi_log}
+\lambda \left[ \int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1  \right] - r - c \xi
+ = 0
+\end{equation}
+
+\end{theorem}
+\begin{proof}
+\proofref{thm:martingale_cond_for_xi}
+\end{proof}
+
+Далее сформулируем утверждение о виде функции в левой части уравнения.
+\begin{theorem}[Строгая выпуклость]\label{thm:strict_convexity_m1}
+Выражение в левой части является строго выпуклой функцией по $\xi$
+\end{theorem}
+\begin{proof}
+\proofref{thm:strict_convexity_m1}
+\end{proof}
+
+Учитывая утверждение выше, это уравнение имеет не более двух решений. На самом деле, она имеет ровно два решения: одно - $\xi_1 = 1$, так как ${e^{-rt} S(Т), t \ge 0}$ должно быть мартингалом; другое решение будет отрицательным, то есть для некоторого $R > 0$ будет иметь вид: $\xi_2 = -R < 0$, так как выражение в левой части - непрерывная функция от $\xi$, которая принимает значение $-r$ при $\xi = 0$ и стремится к $\infty$ при $\xi \to \infty$.
+
+Отметим, что положительный мартингал $e^{-rt} S(t)^{-R}$ ограничен сверху константой $L^{-R}$ при $t < T_L$. 
+
+\begin{theorem}
+Следовательно, мы можем применить теорему о необязательной выборке, чтобы сделать вывод, что:
+
+\begin{equation}\label{eq:opt_sampl_thm_application_to_mart}
+\lambda \left[ \int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1  \right] - r - c \xi = 0
+\end{equation}
+\end{theorem}
+
+Соединяя полученные в \eqref{eq:opt_sampl_thm_application_to_mart} и \eqref{eq:strategy_c1} получаем:
+
+\begin{equation}\label{eq:strategy_c1_simplified}
+V(s; L) = \left(\frac{L}{s}\right)^{R} P(L), s \ge L.
+\end{equation}
+
+Осталось найти $\widetilde{L}$, то есть значение $L$, максимизирующее $L^{R} P(L)$. Тогда условие первого порядка имеет вид:
 
 \section{Сопутствующая литература}
 
@@ -131,12 +242,114 @@ Hans U. Gerber and Elias S.W. Shiu \textbf{"Pricing Perpetual Options for Jump P
 \appendix
 \section{Выкладки}
 \begin{delayedproof}{thm:no_arbitrage_theoreme} 
-Если бы было допустимо $c \le r$, мы бы имели $S(t) \le S(0)e^{rt}$ со строгим неравенством после первого скачка. Следовательно, путем короткой продажи (Подробнее: \autoref{def:short_position}) актива и инвестирования выручки S(0) по безрисковой процентной ставке r мы могли бы получить безрисковую прибыль:
+Если бы было допустимо $c \le r$, мы бы имели $S(t) \le S(0)e^{rt}$ со строгим неравенством после первого скачка (скачки положительные по предположению \ref{sec:listOfFiles}. Следовательно, путем короткой продажи (Подробнее: \autoref{def:short_position}) актива и инвестирования выручки S(0) по безрисковой процентной ставке r мы могли бы получить безрисковую прибыль:
 
 В момент 0 инвестор берёт актив в короткую позицию, сразу её продаёт и сумму $S(0)$ кладёт на депозит в банк под ставку $r$. Далее он ждёт, когда выполнится $e^{rt} S(0) > S(t)$ (это произойдёт при первом скачке стоимости актива $S(t)$. Инвестор забирает деньги с банковского депозита, покупает актив, возвращает его брокеру и имеет безрисковую прибыль $e^{rt}S(0) - S(t)$
 \end{delayedproof}
 
+\begin{delayedproof}{thm:martingale_cond_for_xi} 
+Условие мартингальности для $\{e^{-rt} S(t)^{\xi}\}$ :
+\begin{equation*}
+\expect*{e^{-rt} S(t)^{\xi}|S(0) = s} = s^{\xi}
+\end{equation*}
+Выразим $S(t)$ через $U(t)$, используя определение последнего ($U(t) = \ln{S(t)}$):
+\begin{equation*}
+\expect*{e^{-rt + \xi U(t)}|U(0) = u} = e^{\xi u}
+\end{equation*}
+Подставим $t = 1$. Имеем право, т.к. рассмотрение конкретной реализации процесса не сужает общности решаемой задачи:
+\begin{equation}\label{eq:thm2_eq1}
+e^{-r}\expect*{e^{\xi U(1)}} = e^{\xi u}
+\end{equation}
+
+Из формулировки первой модели, $U(t) = u - ct + Z(t)$, тогда \eqref{eq:thm2_eq1} принимает вид:
+\begin{equation*}
+e^{-r}\expect*{e^{\xi(u - c + Z(1))}} = e^{\xi u}
+\end{equation*}
+Или:
+\begin{equation*}
+e^{-r - c \xi} \expect*{e^{\xi Z(1)}} = 1
+\end{equation*}
+
+Заметим, что внутри математического ожидания у нас производящая функция моментов составного пуассоновского процесса (Подробнее: \autoref{def:compound_poisson}):
+
+\begin{equation}\label{eq:thm2_eq2}
+e^{-r - c \xi} M_{Z(1)}(\xi) = 1
+\end{equation}
+
+Для неё можно применить следующее упрощение:
+
+\begin{theorem}[Производящая функция моментов составного пуассоновского процесса]\label{thm:thm2_moment_generating_function}
+Обозначим производящую функцию моментов случайной величины $X$:
+\begin{equation*}
+    M_X(\alpha) = \expect{e^{\alpha X}}
+\end{equation*}
+Тогда для составного Пуассоновского процесса $\{X(t)\}$.
+\begin{equation}\label{eq:moment_generating_for_poisson}
+     M_{X(t)}(\alpha) = e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
+\end{equation}
+\end{theorem}
+\begin{proof}
+\proofref{thm:thm2_moment_generating_function}
+\end{proof}
+
+То есть, прологарифмировав обе части \eqref{eq:thm2_eq2}:
+\begin{equation*}
+\ln{M_{Z(1)}(\xi)} - r - c\xi = 0
+\end{equation*}
+
+И, подставив теперь в производящей функции результат \eqref{eq:moment_generating_for_poisson} получим:
+\begin{equation*}
+\ln{e^{\lambda (M_{Y_1}(\xi) - 1)}} - r - c\xi = 0
+\end{equation*}
+
+Упростив полученное:
+\begin{equation*}
+\lambda \left(M_{Y_1}(\xi) - 1\right) - r - c\xi = 0
+\end{equation*}
+
+Подставим выражения для мат.ожидания скачка получим требуемое:
+\begin{equation*}
+\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi = 0
+\end{equation*}
+
+\end{delayedproof}
+
+\begin{delayedproof}{thm:strict_convexity_m1}
+Рассмотрим вторую производную данной функции:
+\begin{equation*}
+\begin{split}
+     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x \,dx \right) - c \right] &= \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{\xi x} x^2}
+\end{split}
+\end{equation*}
+
+Так как $\lambda > 0, x^2 \ge 0, e^{\xi x} > 0, p(x > 0) \neq 0$, выражение внутри строго положительно, как произведение положительной величины и матожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна.
+
+\end{delayedproof}
+
+\begin{delayedproof}{thm:thm2_moment_generating_function}
+Необходимое получается из цепочки уравнений
+\begin{equation*}
+\begin{split}
+     M_{X_t}(\alpha) & = \expect[\big]{e^{\alpha X_t}} & = \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} & = \sum_{m=0}^{\infty} \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} P(N_t = m) & = \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{N_t} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \expect[\big]{(\left(e^{\alpha Y_1}\right))^{m}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} M_{Y_1} (\alpha)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} &= e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
+\end{split}
+\end{equation*}
+
+\end{delayedproof}
+
+% https://math.stackexchange.com/questions/1090696/moment-generating-function-of-a-compound-poisson-process
+
+
 \section{Определения}
+\begin{definition}[Составной пуассоновский процесс]
+    \label{def:compound_poisson}
+    Процесс $\{X_t, t \ge 0\}$ называется \textbf{составным процессом Пуассона}, если мы можем записать его как:
+    
+    \begin{equation}
+        X_t = \sum_{i=1}^{N_t} Y_i,
+    \end{equation}
+    
+    где $\{N_t, t \ge 0\}$ - процесс Пуассона, а $\{Y_n\}_{n \ge 1}$ - семейство случайных независимых v. с тем же распределением, которые также независимы от $\{N_t, t \ge 0\}$.
+\end{definition}
 \begin{definition}[Шорт, короткая позиция]
     \label{def:short_position}
     \textbf{Продажа без покрытия или торговля в шорт} - продажа ценных бумаг, товаров или валюты, которыми торговец на момент продажи не владеет. Такая операция возможна, если условия контракта предусматривают его исполнение (поставку) через некоторое время или при маржинальной торговле, когда разрешено продавать взятый у брокера в кредит товар с предполагаемой последующей покупкой аналогичного товара и возврата кредита в натуральном (товарном) виде. Торговец надеется, что цена упадёт и он сможет дешевле выкупить ранее проданный товар. Этот механизм обеспечивает возможность получать прибыль при снижении цен.
