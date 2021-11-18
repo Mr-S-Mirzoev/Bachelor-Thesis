@@ -1,6 +1,6 @@
  \documentclass[a4paper,12pt]{article}
 
-\usepackage{hyperref}
+\usepackage[colorlinks]{hyperref}
 \usepackage[affil-it]{authblk}
 \usepackage[rgb]{xcolor}
 \hypersetup{				% Гиперссылки
@@ -19,9 +19,9 @@
 
 % Математика
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{thmtools}
 
 \usepackage{physics}
-\usepackage[colorlinks]{hyperref}
 \usepackage{cleveref}
 
 % Mathematical formating
@@ -33,15 +33,6 @@
 % Add lemma support
 \newtheorem{lemma}{Лемма}
 \newtheorem{sublemma}{Лемма}[lemma]
-
-% Delayed Proof
-\newenvironment{delayedproof}[1]
- {\begin{proof}[\raisedtarget{#1}Доказательство \autoref{#1}]}
- {\end{proof}}
-\newcommand{\raisedtarget}[1]{%
-  \raisebox{\fontcharht\font`P}[0pt][0pt]{\hypertarget{#1}{}}%
-}
-\newcommand{\proofref}[1]{\hyperlink{#1}{в приложении к статье}}
 
 \usepackage{wasysym}
 
