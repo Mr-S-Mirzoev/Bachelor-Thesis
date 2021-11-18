@@ -31,7 +31,7 @@ jobs:
            sudo apt-get install -y texlive-fonts-recommended 
            sudo apt-get install -y texlive-fonts-extra 
            sudo apt-get install -y texlive-latex-extra 
-           sudo apt-get install -y texlive-langcyrillic
+           sudo apt-get install -y texlive-lang-cyrillic
 
       # Runs a set of commands using the runners shell
       - name: Build a PDF file
