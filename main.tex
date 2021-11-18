@@ -1,6 +1,6 @@
  \documentclass[a4paper,12pt]{article}
 
-\usepackage[colorlinks]{hyperref}
+\usepackage[colorlinks,unicode]{hyperref}
 \usepackage[affil-it]{authblk}
 \usepackage[rgb]{xcolor}
 \hypersetup{				% Гиперссылки
@@ -18,7 +18,7 @@
 \usepackage[bottom]{footmisc}
 
 % Математика
-\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{amsmath, amsfonts,amssymb,amsthm,mathtools}
 \usepackage{thmtools}
 
 \usepackage{physics}
@@ -259,7 +259,9 @@ e^{-r - c \xi} M_{Z(1)}(\xi) = 1
 Далее необходимое получается при подстановке \eqref{eq:thm2_moment_generating_function_eq1} и \eqref{eq:thm2_moment_generating_function_eq2} в цепочку уравнений:
 \begin{equation*}
 \begin{split}
-    \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \left(\expect[\big]{e^{\alpha Y_1}}\right)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} (M_{Y_1} (\alpha))^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} &= e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
+    \sum_{m=0}^{\infty} \expect{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \left(\expect{e^{\alpha Y_1}}\right)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} =\\
+    = \sum_{m=0}^{\infty} (M_{Y_1} (\alpha))^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} =\\
+    = e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
 \end{split}
 \end{equation*}
 \end{proof}
@@ -293,7 +295,8 @@ e^{-r - c \xi} M_{Z(1)}(\xi) = 1
 Рассмотрим вторую производную данной функции:
 \begin{equation*}
 \begin{split}
-     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x \,dx \right) - c \right] &= \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{\xi x} x^2}
+     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x \,dx \right) - c \right] =\\
+     = \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{\xi x} x^2}
 \end{split}
 \end{equation*}
 
@@ -324,7 +327,8 @@ f(0) = \lambda \left(\int_{0}^{+\infty} e^{0} p(x) \,dx - 1\right) - r = \lambda
 
 \begin{equation*}
 \begin{split}
-\lim_{\xi\to-\infty} f(\xi) &= \lim_{\xi\to-\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= - \lambda - r - c \xi &= +\infty
+\lim_{\xi\to-\infty} f(\xi) &= \lim_{\xi\to-\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] =\\
+= - \lambda - r - c \xi &= +\infty
 \end{split}
 \end{equation*}
 
