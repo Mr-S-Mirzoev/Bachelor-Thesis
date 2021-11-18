@@ -27,7 +27,7 @@ jobs:
       
       - name: Install required packages
         run: |
-	   curl -L https://raw.githubusercontent.com/aslushnikov/latex-online/master/util/latexonline > laton
+           curl -L https://raw.githubusercontent.com/aslushnikov/latex-online/master/util/latexonline > laton
            chmod 755 laton
       # Runs a set of commands using the runners shell
       - name: Build a PDF file
