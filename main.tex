@@ -384,10 +384,25 @@ f(0) = \lambda \left(\int_{0}^{+\infty} e^{0} p(x) \,dx - 1\right) - r = \lambda
 \end{delayedproof}
 
 \begin{delayedproof}{thm:thm2_moment_generating_function}
-Необходимое получается из цепочки уравнений
+Распишем производящую функцию моментов для составного Пуассоновского процесса:
+\begin{equation*}
+     M_{X_t}(\alpha) = \expect[\big]{e^{\alpha X_t}} = \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}}
+\end{equation*}
+
+Также заметим, что распределение $N_t$ нам известно:
+\begin{equation}\label{eq:thm2_moment_generating_function_eq1}
+     \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} = \sum_{m=0}^{\infty} \expect[\big]{e^{\alpha \sum_{i=1}^{m} Y_i}} P(N_t = m) = \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!}
+\end{equation}
+
+Так как случайные величины $Y_i$ независимы и одинаково распределены, верно:
+\begin{equation}\label{eq:thm2_moment_generating_function_eq2}
+     \expect[\big]{e^{\alpha \sum_{i=1}^{m} Y_i}} = \expect[\big]{\prod_{i=1}^{m} e^{\alpha Y_i}} = \prod_{i=1}^{m}  \expect[\big]{e^{\alpha Y_i}} = \prod_{i=1}^{m}  \expect[\big]{e^{\alpha Y_1}} = \left( \expect[\big]{e^{\alpha Y_1}} \right)^{m}
+\end{equation}
+
+Далее необходимое получается при подстановке \eqref{eq:thm2_moment_generating_function_eq1} и \eqref{eq:thm2_moment_generating_function_eq2} в цепочку уравнений:
 \begin{equation*}
 \begin{split}
-     M_{X_t}(\alpha) & = \expect[\big]{e^{\alpha X_t}} & = \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} & = \sum_{m=0}^{\infty} \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} P(N_t = m) & = \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{N_t} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \expect[\big]{(\left(e^{\alpha Y_1}\right))^{m}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} M_{Y_1} (\alpha)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} &= e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
+    \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \left(\expect[\big]{e^{\alpha Y_1}}\right)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} (M_{Y_1} (\alpha))^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} &= e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
 \end{split}
 \end{equation*}
 
