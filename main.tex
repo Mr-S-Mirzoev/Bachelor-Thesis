@@ -355,7 +355,20 @@ s^{-R} = \expect*{e^{-rT_L} | S(0) = s} L^{-R}
 \end{equation}
 \end{theorem}
 \begin{proof}
-Итак, теорема о преобразовании свободного выбора (\autoref{def:OptSamplTheorem}) даёт нам:
+% https://almostsuremath.com/2009/12/20/optional-sampling/
+Итак, теорема о преобразовании свободного выбора (\autoref{def:OptSamplTheorem}) для мартингала сводится к следующему:
+
+Если ${X}$ - мартингал, то ${X_\sigma=\expect*{X_{\tau} | \mathcal{F}_\sigma}.}$.
+
+В нашем случае: $\sigma = 0$, $\mathcal{F}_\sigma = \{S(0) = s\}$, а $X_{\tau} = e^{-r\tau} S(\tau)^{-R}$. Тогда:
+\begin{equation*}
+    \expect*{e^{-rT_L} S(T_L)^{-R} | S(0) = s} = X_\sigma = X_0 = S(0)^{-R} = s^{-r}
+\end{equation*}
+
+Итак, осталось связать мат.ожидание с нашим верхним ограничением.
+\begin{equation*}
+     \expect*{e^{-rT_L} S(T_L)^{-R} | S(0) = s} = \expect*{e^{-rT_L} | S(0) = s} L^{-R}
+\end{equation*}
 \end{proof}
 
 Соединяя полученные в \eqref{eq:opt_sampl_thm_application_to_mart} и \eqref{eq:strategy_c1} получаем:
