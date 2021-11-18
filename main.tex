@@ -30,6 +30,11 @@
 \newtheorem{definition}{Определение}[section]
 \renewcommand{\theoremautorefname}{теоремы}
 
+% Add lemma support
+\newtheorem{lemma}{Лемма}
+\newtheorem{sublemma}{Лемма}[lemma]
+
+% Delayed Proof
 \newenvironment{delayedproof}[1]
  {\begin{proof}[\raisedtarget{#1}Доказательство \autoref{#1}]}
  {\end{proof}}
@@ -132,11 +137,13 @@
 \label{sec:positivityOfJumsAssumption} Для упрощения обозначений предположим, что распределения величин скачка
 непрерывны с плотностью вероятности $p(x), x \ge 0$. 
 
-\begin{theorem}[Отсутствие арбитража]\label{thm:no_arbitrage_theoreme}
+\begin{lemma}[Отсутствие арбитража]\label{thm:no_arbitrage_theoreme}
 В модели \rom{2} мы делаем дополнительное предположение, что $c > r$ иначе возникает возможность арбитража. 
-\end{theorem}
+\end{lemma}
 \begin{proof}
-\proofref{thm:no_arbitrage_theoreme}
+Если бы было допустимо $c \le r$, мы бы имели $S(t) \le S(0)e^{rt}$ со строгим неравенством после первого скачка (скачки положительные по предположению $x \ge 0$. Следовательно, путем короткой продажи (Подробнее: \autoref{def:short_position}) актива и инвестирования выручки S(0) по безрисковой процентной ставке r мы могли бы получить безрисковую прибыль:
+
+В момент 0 инвестор берёт актив в короткую позицию, сразу её продаёт и сумму $S(0)$ кладёт на депозит в банк под ставку $r$. Далее он ждёт, когда выполнится $e^{rt} S(0) > S(t)$ (это произойдёт при первом скачке стоимости актива $S(t)$. Инвестор забирает деньги с банковского депозита, покупает актив, возвращает его брокеру и имеет безрисковую прибыль $e^{rt}S(0) - S(t)$
 \end{proof}
 
 Обратите внимание, что модель \rom{2} напоминает модель, которая используется для процесса избытка в классической теории риска.
@@ -202,25 +209,135 @@ e^{-r - c\xi} \expect*{e^{\xi Z(1)}|U(0) = u} = 1
 
 \end{theorem}
 \begin{proof}
-\proofref{thm:martingale_cond_for_xi}
+Условие мартингальности для $\{e^{-rt} S(t)^{\xi}\}$ :
+\begin{equation*}
+\expect*{e^{-rt} S(t)^{\xi}|S(0) = s} = s^{\xi}
+\end{equation*}
+Выразим $S(t)$ через $U(t)$, используя определение последнего ($U(t) = \ln{S(t)}$):
+\begin{equation*}
+\expect*{e^{-rt + \xi U(t)}|U(0) = u} = e^{\xi u}
+\end{equation*}
+Подставим $t = 1$. Имеем право, т.к. рассмотрение конкретной реализации процесса не сужает общности решаемой задачи:
+\begin{equation}\label{eq:thm2_eq1}
+e^{-r}\expect*{e^{\xi U(1)}} = e^{\xi u}
+\end{equation}
+
+Из формулировки первой модели, $U(t) = u - ct + Z(t)$, тогда \eqref{eq:thm2_eq1} принимает вид:
+\begin{equation*}
+e^{-r}\expect*{e^{\xi(u - c + Z(1))}} = e^{\xi u}
+\end{equation*}
+Или:
+\begin{equation*}
+e^{-r - c \xi} \expect*{e^{\xi Z(1)}} = 1
+\end{equation*}
+
+Заметим, что внутри математического ожидания у нас производящая функция моментов составного пуассоновского процесса (Подробнее: \autoref{def:compound_poisson}):
+
+\begin{equation}\label{eq:thm2_eq2}
+e^{-r - c \xi} M_{Z(1)}(\xi) = 1
+\end{equation}
+
+Для неё можно применить следующее упрощение:
+
+\begin{lemma}[Производящая функция моментов составного пуассоновского процесса]\label{thm:thm2_moment_generating_function}
+Обозначим производящую функцию моментов случайной величины $X$:
+\begin{equation*}
+    M_X(\alpha) = \expect{e^{\alpha X}}
+\end{equation*}
+Тогда для составного Пуассоновского процесса $\{X(t)\}$.
+\begin{equation}\label{eq:moment_generating_for_poisson}
+     M_{X(t)}(\alpha) = e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
+\end{equation}
+\end{lemma}
+\begin{proof}
+Распишем производящую функцию моментов для составного Пуассоновского процесса:
+\begin{equation*}
+     M_{X_t}(\alpha) = \expect[\big]{e^{\alpha X_t}} = \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}}
+\end{equation*}
+
+Также заметим, что распределение $N_t$ нам известно:
+\begin{equation}\label{eq:thm2_moment_generating_function_eq1}
+     \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} = \sum_{m=0}^{\infty} \expect[\big]{e^{\alpha \sum_{i=1}^{m} Y_i}} P(N_t = m) = \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!}
+\end{equation}
+
+Так как случайные величины $Y_i$ независимы и одинаково распределены, верно:
+\begin{equation}\label{eq:thm2_moment_generating_function_eq2}
+     \expect[\big]{e^{\alpha \sum_{i=1}^{m} Y_i}} = \expect[\big]{\prod_{i=1}^{m} e^{\alpha Y_i}} = \prod_{i=1}^{m}  \expect[\big]{e^{\alpha Y_i}} = \prod_{i=1}^{m}  \expect[\big]{e^{\alpha Y_1}} = \left( \expect[\big]{e^{\alpha Y_1}} \right)^{m}
+\end{equation}
+
+Далее необходимое получается при подстановке \eqref{eq:thm2_moment_generating_function_eq1} и \eqref{eq:thm2_moment_generating_function_eq2} в цепочку уравнений:
+\begin{equation*}
+\begin{split}
+    \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \left(\expect[\big]{e^{\alpha Y_1}}\right)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} (M_{Y_1} (\alpha))^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} &= e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
+\end{split}
+\end{equation*}
+\end{proof}
+
+То есть, прологарифмировав обе части \eqref{eq:thm2_eq2}:
+\begin{equation*}
+\ln{M_{Z(1)}(\xi)} - r - c\xi = 0
+\end{equation*}
+
+И, подставив теперь в производящей функции результат \eqref{eq:moment_generating_for_poisson} получим:
+\begin{equation*}
+\ln{e^{\lambda (M_{Y_1}(\xi) - 1)}} - r - c\xi = 0
+\end{equation*}
+
+Упростив полученное:
+\begin{equation*}
+\lambda \left(M_{Y_1}(\xi) - 1\right) - r - c\xi = 0
+\end{equation*}
+
+Подставим выражения для мат.ожидания скачка получим требуемое:
+\begin{equation*}
+\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi = 0
+\end{equation*}
 \end{proof}
 
 Далее сформулируем утверждение о виде функции в левой части уравнения.
-\begin{theorem}[Строгая выпуклость]\label{thm:strict_convexity_m1}
-Выражение в левой части является строго выпуклой функцией по $\xi$
-\end{theorem}
+\begin{lemma}[Строгая выпуклость]\label{thm:strict_convexity_m1}
+Выражение в левой части уравнения \eqref{eq:martingale_cond_for_xi_log} является строго выпуклой функцией по $\xi$
+\end{lemma}
 \begin{proof}
-\proofref{thm:strict_convexity_m1}
+Рассмотрим вторую производную данной функции:
+\begin{equation*}
+\begin{split}
+     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x \,dx \right) - c \right] &= \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{\xi x} x^2}
+\end{split}
+\end{equation*}
+
+Так как $\lambda > 0, x^2 \ge 0, e^{\xi x} > 0, p(x > 0) \neq 0$, выражение внутри строго положительно, как произведение положительной величины и мат.ожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна. Попутно было доказано, что и первая производная монотонна (x > 0), а значит имеем дело с монотонной строго выпуклой функцией.
+
 \end{proof}
 
-Учитывая утверждение выше, это уравнение имеет не более двух решений. На самом деле, она имеет ровно два решения:
-\begin{theorem}[Решение уравнения \eqref{eq:martingale_cond_for_xi_log}]\label{thm:solution_for_mart_cond_m1}
+Учитывая утверждение выше, уравнение \eqref{eq:martingale_cond_for_xi_log} имеет не более двух решений. На самом деле, она имеет ровно два решения.
+\begin{lemma}[О числе решений уравнения \eqref{eq:martingale_cond_for_xi_log}]\label{thm:solution_for_mart_cond_m1}
 Уравнение \eqref{eq:martingale_cond_for_xi_log} имеет ровно два решения. \\
 Первое: $\xi_1 = 1$, \\
 Второе: $\xi_2 = -R < 0$, для некоторого $R > 0$
-\end{theorem}
+\end{lemma}
 \begin{proof}
-\proofref{thm:solution_for_mart_cond_m1}
+Обозначим функцию в левой части уравнения \eqref{eq:martingale_cond_for_xi_log} через $f(\xi)$:
+\begin{equation*}
+f(\xi) = \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi
+\end{equation*}
+
+Первое решение $\xi_1 = 1$ возникает, так как ${e^{-rt} S(T), t \ge 0}$ должно быть мартингалом.
+
+Второе решение будет отрицательным, то есть для некоторого $R > 0$ будет иметь вид: $\xi_2 = -R < 0$.
+Это следует из того, что $f(0) = -r$ и $\lim_{\xi\to-\infty} f(\xi) = +\infty$:
+
+\begin{equation*}
+f(0) = \lambda \left(\int_{0}^{+\infty} e^{0} p(x) \,dx - 1\right) - r = \lambda (1 - 1) - r = -r
+\end{equation*}
+
+\begin{equation*}
+\begin{split}
+\lim_{\xi\to-\infty} f(\xi) &= \lim_{\xi\to-\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= - \lambda - r - c \xi &= +\infty
+\end{split}
+\end{equation*}
+
+А так как выражение в левой части - непрерывная монотонная функция от $\xi$, она принимает все значения лежащие в $[-R, +\infty)$ на $\xi \in (-\infty, 0]$
 \end{proof}
 
 Отметим, что положительный мартингал $e^{-rt} S(t)^{-R}$ ограничен сверху константой $L^{-R}$ при $t < T_L$. Это легко показать - по определению $T_L$ \eqref{eq:optimal_excersize}:
@@ -232,12 +349,10 @@ S(t) \ge L, \forall t < T_L
 e^{-rt}S(t)^{-R} \le e^{-rt}L^{-R} < L^{-R}
 \end{equation*}
 
-
+Следовательно, мы можем применить теорему о необязательной выборке, чтобы сделать следующий вывод:
 \begin{theorem}
-Следовательно, мы можем применить теорему о необязательной выборке, чтобы сделать вывод, что:
-
 \begin{equation}\label{eq:opt_sampl_thm_application_to_mart}
-\lambda \left[ \int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1  \right] - r - c \xi = 0
+s^{-R} = \expect*{e^{-rT_L} | S(0) = s} L^{-R}
 \end{equation}
 \end{theorem}
 
@@ -270,146 +385,7 @@ Hans U. Gerber and Elias S.W. Shiu \textbf{"Pricing Perpetual Options for Jump P
 \end{thebibliography}
 
 \appendix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%% Приложение: Выкладки %%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Выкладки}
-\begin{delayedproof}{thm:no_arbitrage_theoreme} 
-Если бы было допустимо $c \le r$, мы бы имели $S(t) \le S(0)e^{rt}$ со строгим неравенством после первого скачка (скачки положительные по предположению \ref{sec:listOfFiles}. Следовательно, путем короткой продажи (Подробнее: \autoref{def:short_position}) актива и инвестирования выручки S(0) по безрисковой процентной ставке r мы могли бы получить безрисковую прибыль:
-
-В момент 0 инвестор берёт актив в короткую позицию, сразу её продаёт и сумму $S(0)$ кладёт на депозит в банк под ставку $r$. Далее он ждёт, когда выполнится $e^{rt} S(0) > S(t)$ (это произойдёт при первом скачке стоимости актива $S(t)$. Инвестор забирает деньги с банковского депозита, покупает актив, возвращает его брокеру и имеет безрисковую прибыль $e^{rt}S(0) - S(t)$
-\end{delayedproof}
-
-\begin{delayedproof}{thm:martingale_cond_for_xi} 
-Условие мартингальности для $\{e^{-rt} S(t)^{\xi}\}$ :
-\begin{equation*}
-\expect*{e^{-rt} S(t)^{\xi}|S(0) = s} = s^{\xi}
-\end{equation*}
-Выразим $S(t)$ через $U(t)$, используя определение последнего ($U(t) = \ln{S(t)}$):
-\begin{equation*}
-\expect*{e^{-rt + \xi U(t)}|U(0) = u} = e^{\xi u}
-\end{equation*}
-Подставим $t = 1$. Имеем право, т.к. рассмотрение конкретной реализации процесса не сужает общности решаемой задачи:
-\begin{equation}\label{eq:thm2_eq1}
-e^{-r}\expect*{e^{\xi U(1)}} = e^{\xi u}
-\end{equation}
-
-Из формулировки первой модели, $U(t) = u - ct + Z(t)$, тогда \eqref{eq:thm2_eq1} принимает вид:
-\begin{equation*}
-e^{-r}\expect*{e^{\xi(u - c + Z(1))}} = e^{\xi u}
-\end{equation*}
-Или:
-\begin{equation*}
-e^{-r - c \xi} \expect*{e^{\xi Z(1)}} = 1
-\end{equation*}
-
-Заметим, что внутри математического ожидания у нас производящая функция моментов составного пуассоновского процесса (Подробнее: \autoref{def:compound_poisson}):
-
-\begin{equation}\label{eq:thm2_eq2}
-e^{-r - c \xi} M_{Z(1)}(\xi) = 1
-\end{equation}
-
-Для неё можно применить следующее упрощение:
-
-\begin{theorem}[Производящая функция моментов составного пуассоновского процесса]\label{thm:thm2_moment_generating_function}
-Обозначим производящую функцию моментов случайной величины $X$:
-\begin{equation*}
-    M_X(\alpha) = \expect{e^{\alpha X}}
-\end{equation*}
-Тогда для составного Пуассоновского процесса $\{X(t)\}$.
-\begin{equation}\label{eq:moment_generating_for_poisson}
-     M_{X(t)}(\alpha) = e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
-\end{equation}
-\end{theorem}
-\begin{proof}
-\proofref{thm:thm2_moment_generating_function}
-\end{proof}
-
-То есть, прологарифмировав обе части \eqref{eq:thm2_eq2}:
-\begin{equation*}
-\ln{M_{Z(1)}(\xi)} - r - c\xi = 0
-\end{equation*}
-
-И, подставив теперь в производящей функции результат \eqref{eq:moment_generating_for_poisson} получим:
-\begin{equation*}
-\ln{e^{\lambda (M_{Y_1}(\xi) - 1)}} - r - c\xi = 0
-\end{equation*}
-
-Упростив полученное:
-\begin{equation*}
-\lambda \left(M_{Y_1}(\xi) - 1\right) - r - c\xi = 0
-\end{equation*}
-
-Подставим выражения для мат.ожидания скачка получим требуемое:
-\begin{equation*}
-\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi = 0
-\end{equation*}
-
-\end{delayedproof}
-
-\begin{delayedproof}{thm:strict_convexity_m1}
-Рассмотрим вторую производную данной функции:
-\begin{equation*}
-\begin{split}
-     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x \,dx \right) - c \right] &= \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{\xi x} x^2}
-\end{split}
-\end{equation*}
-
-Так как $\lambda > 0, x^2 \ge 0, e^{\xi x} > 0, p(x > 0) \neq 0$, выражение внутри строго положительно, как произведение положительной величины и мат.ожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна. Попутно было доказано, что и первая производная монотонна (x > 0), а значит имеем дело с монотонной строго выпуклой функцией.
-
-\end{delayedproof}
-
-\begin{delayedproof}{thm:solution_for_mart_cond_m1}
-Обозначим функцию в левой части уравнения \eqref{eq:martingale_cond_for_xi_log} через $f(\xi)$:
-\begin{equation*}
-f(\xi) = \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi
-\end{equation*}
-
-Первое решение $\xi_1 = 1$ возникает, так как ${e^{-rt} S(Т), t \ge 0}$ должно быть мартингалом.
-
-Второе решение будет отрицательным, то есть для некоторого $R > 0$ будет иметь вид: $\xi_2 = -R < 0$.
-Это следует из того, что $f(0) = -r$ и $\lim_{\xi\to-\infty} f(\xi) = +\infty$:
-
-\begin{equation*}
-f(0) = \lambda \left(\int_{0}^{+\infty} e^{0} p(x) \,dx - 1\right) - r = \lambda (1 - 1) - r = -r
-\end{equation*}
-
-\begin{equation*}
-\begin{split}
-\lim_{\xi\to-\infty} f(\xi) &= \lim_{\xi\to-\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= - \lambda - r - c \xi &= +\infty
-\end{split}
-\end{equation*}
-
-А так как выражение в левой части - непрерывная монотонная функция от $\xi$, она принимает все значения лежащие в $[-R, +\infty)$ на $\xi \in (-\infty, 0]$
-\end{delayedproof}
-
-\begin{delayedproof}{thm:thm2_moment_generating_function}
-Распишем производящую функцию моментов для составного Пуассоновского процесса:
-\begin{equation*}
-     M_{X_t}(\alpha) = \expect[\big]{e^{\alpha X_t}} = \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}}
-\end{equation*}
-
-Также заметим, что распределение $N_t$ нам известно:
-\begin{equation}\label{eq:thm2_moment_generating_function_eq1}
-     \expect[\big]{e^{\alpha \sum_{i=1}^{N_t} Y_i}} = \sum_{m=0}^{\infty} \expect[\big]{e^{\alpha \sum_{i=1}^{m} Y_i}} P(N_t = m) = \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!}
-\end{equation}
-
-Так как случайные величины $Y_i$ независимы и одинаково распределены, верно:
-\begin{equation}\label{eq:thm2_moment_generating_function_eq2}
-     \expect[\big]{e^{\alpha \sum_{i=1}^{m} Y_i}} = \expect[\big]{\prod_{i=1}^{m} e^{\alpha Y_i}} = \prod_{i=1}^{m}  \expect[\big]{e^{\alpha Y_i}} = \prod_{i=1}^{m}  \expect[\big]{e^{\alpha Y_1}} = \left( \expect[\big]{e^{\alpha Y_1}} \right)^{m}
-\end{equation}
-
-Далее необходимое получается при подстановке \eqref{eq:thm2_moment_generating_function_eq1} и \eqref{eq:thm2_moment_generating_function_eq2} в цепочку уравнений:
-\begin{equation*}
-\begin{split}
-    \sum_{m=0}^{\infty} \expect[\big]{e^{\left(\alpha \sum_{i=1}^{m} Y_i\right)}} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \left(\expect[\big]{e^{\alpha Y_1}}\right)^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} (M_{Y_1} (\alpha))^{m} \frac{(\lambda t)^{m} e^{-\lambda t}}{m!} &= \sum_{m=0}^{\infty} \frac{(M_{Y_1} (\alpha) \lambda t)^{m}}{m!} e^{-\lambda t} &= e^{\left(M_{Y_1} (\alpha) \lambda t\right)} e^{-\lambda t} &= e^{\lambda t \left(M_{Y_1}(\alpha) - 1\right)}
-\end{split}
-\end{equation*}
-
-\end{delayedproof}
-
 % https://math.stackexchange.com/questions/1090696/moment-generating-function-of-a-compound-poisson-process
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Приложение: Определения %%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
