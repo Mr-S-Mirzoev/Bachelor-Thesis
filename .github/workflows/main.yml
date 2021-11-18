@@ -24,6 +24,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      
+      - name: Install required packages
+        run: |
+           sudo apt-get install texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
       # Runs a set of commands using the runners shell
       - name: Build a PDF file
