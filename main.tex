@@ -1,8 +1,21 @@
 \documentclass[a4paper,12pt]{article}
 
+\providecommand{\No}{\textnumero}
+%\setmarginsrb{3cm}{2cm}{1cm}{2cm}{0pt}{0mm}{0pt}{13mm}
+\usepackage{indentfirst}
+\sloppy
+\setcounter{page}{0}
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+\usepackage[nottoc]{tocbibind} % Для того, чтобы список литературы отображался в оглавлении
+\usepackage{verbatim} % Для вставок заранее подготовленного текста в режиме as-is
+
 \usepackage[colorlinks,unicode]{hyperref}
 \usepackage[affil-it]{authblk}
 \usepackage[rgb]{xcolor}
+\usepackage{float}
+\usepackage{colortbl}
 \hypersetup{				% Гиперссылки
     colorlinks=true,       	% false: ссылки в рамках
 	urlcolor=blue           % на URL
@@ -72,12 +85,6 @@
 
 \usepackage{wasysym}
 
-%Заголовок
-\author{Мирзоев С.Е.%
-\thanks{E-mail: \texttt{mrsergeymirzoev@gmail.com}}}
-\title{Оценка бессрочных опционов для случайных процессов со скачками}
-\affil{Факультет Вычислительной Математики и Кибернетики, Московский государственный университет им. М.В.Ломоносова}
-
 \makeatletter
 % Roman numbers support
 \newcommand*{\rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
@@ -106,32 +113,55 @@
 
 \begin{document}
 
-\begin{titlepage}
-\centering
+% НАЧАЛО ТИТУЛЬНОГО ЛИСТА
+\begin{center}
+\ \vspace{-2cm}
 
-\textsc{Дипломная работа}
+%\includegraphics[width=0.5\textwidth]{msu.eps}\\
+\includegraphics[width=0.5\textwidth]{img/msu.jpg}\\
+{\scshape Московский государственный университет \\ имени М.В. Ломоносова}\\
+Факультет вычислительной математики и кибернетики\\
+Кафедра исследования операций
 
-\vspace{\stretch{1}}
+\vspace{4cm}
 
-{\LARGE\bfseries Оценка бессрочных колл-опционов для случайных процессов со скачками\\}
-\rule{3in}{0.4pt}
+\textbf{{\Large Мирзоев Сергей Евгеньевич}}
 
-\vspace{\stretch{1}}
+\vspace{1cm}
 
-\textbf{Мирзоев С.Е.}\\
-Московский государственный университет им. М.В.Ломоносова\\
-Факультет Вычислительной Математики и Кибернетики\\
-Март 2022
+{\Huge\bfseries
+Оценка бессрочных опционов для случайных процессов со скачками\\}
+\end{center}
 
-\vspace{\stretch{1}}
+\vspace{1cm}
+\begin{center}
+{\normalsize Выпускная квалификационная работа}
+\end{center}
 
-{\small
-Научный руководитель: Белянкин Г.А.\\
-Со-руководитель: Морозов В.В.}
+\vspace{2cm}
 
-\vspace*{\stretch{1}}
+\vfill
 
-\end{titlepage}
+\begin{flushright}
+\normalsize
+\textbf{Научный руководитель:}\\
+доцент, к.ф.-м.н\\
+Г.А. Белянкин\\
+\textbf{Со-руководитель:}\\
+доцент, к.ф.-м.н\\
+В.В. Морозов
+\end{flushright}
+
+\vfill
+
+\begin{center}
+Москва, 2021
+\end{center}
+
+\enlargethispage{4\baselineskip}
+\thispagestyle{empty} % выключаем отображение номера для этой страницы
+\newpage
+
 \thispagestyle{empty}
 
 \newpage
@@ -144,9 +174,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Введение}
 
-Разработка современных моделей ценообразования опционов началась с публикации Фишера Блэка и Майрона Шоулза в 1973 году\textsuperscript{\cite{bib:Black_Scholes}}. Их работа навсегда изменила взгляд как практиков, так и теоретиков ценообразования производных ценных бумаг. Впоследствии ученые вышли за рамки Блэка-Шоулза, внеся изменения, и теперь мы можем прочитать о нескольких моделях ценообразования опционов.
+Разработка современных моделей ценообразования опционов началась с публикации Фишера Блэка и Майрона Шоулза в 1973 году \cite{bib:Black_Scholes}. Их работа навсегда изменила взгляд как практиков, так и теоретиков ценообразования производных ценных бумаг. Данная модель использовалась впоследствии многими авторами для оценки оптимального порога для бесконечного колл-опциона в модели Блэка - Шоулза \cite{bib:Perpetual_Mart1, bib:Perpetual_Mart2}. Впоследствии, как в прошлом веке \cite{bib:Musiela1997}, так и в наше время \cite{bib:BSModification} ряд авторов часто обращались к оригинальной статье и сумели развить модель Блэка-Шоулза, внеся в нее существенные дополнения, и в настоящее время можно говорить о существовании нескольких подходов к ценообразованию опционов.
 
-Существуют модели, которые проводятся для воспроизведения эффекта кластеризации волатильности, такие как стохастическая волатильность и модели GARCH. В данной работе более подробно рассмотренны аффинные модели стохастической волатильности и аффинной скачкообразной диффузии, которые представляют собой комбинацию моделей стохастической волатильности и скачкообразной диффузии.
+Известно, что реальные финансовые данные имеют большую волатильность в течение определенного периода, а в другое время они имеют меньшую волатильность на рынке. Существуют модели, которые проводятся для воспроизведения эффекта кластеризации волатильности, такие как стохастическая волатильность и модели GARCH \cite{bib:GARCH}.  В данной работе более подробно рассмотренны аффинные модели стохастической волатильности и аффинной скачкообразной диффузии, которые представляют собой комбинацию моделей стохастической волатильности и скачкообразной диффузии.
 
 Серьёзный вклад в создание моделей для оценки опционов и прочих дериватовов внесли Гербер и Шиу, наиболее заметными работами которых являются оценка опционов с помощью преобразования Эшера, где было показано, что преобразование Эшера также является эффективным методом оценки производных ценных бумаг, если логарифмы цен примитивных ценных бумаг подчиняются определенным стохастическим процессам со стационарными и независимыми приращениями \cite{bib:GerberShiu_Esscher}; а также статьи, где рассматривались актуарные подходы к оценке опционов \cite{bib:GerberShiu_Actuarial_1, bib:GerberShiu_Actuarial_2, bib:GerberShiu_Actuarial_3}. 
 
@@ -170,7 +200,7 @@
 
 где $\tilde{\alpha} = \alpha - \frac{\sigma^2}{2}$, а $Z (t)$ - винеровский процесс. В рассматриваемыми нами моделями, будет рассмотрена стоимость акций для процесса со скачками.
 
-Простота модели Блэка-Шоулза была достигнута путем принятия следующих допущений, что цена актива следует геометрическому броуновскому движению $\dv{S(t)}{S(t)} = \mu dt + \sigma dW(t)$, где $W$ - броуновское движение, $\mu$ - среднее значение, также известное как дрейф, $\sigma$ представляет собой волатильность относительного изменения цены акций, а $S(t)$ - текущую цену акций. Также предполагается, что волатильность $\sigma$ изменения цены акций и безрисковая процентная ставка r являются постоянными.
+Простота модели Блэка-Шоулза была достигнута путем принятия следующих допущений, что цена актива следует геометрическому броуновскому движению $\frac{dS(t)}{S(t)} = \mu dt + \sigma dW(t)$, где $W$ - броуновское движение, $\mu$ - среднее значение, также известное как дрейф, $\sigma$ представляет собой волатильность относительного изменения цены акций, а $S(t)$ - текущую цену акций. Также предполагается, что волатильность $\sigma$ изменения цены акций и безрисковая процентная ставка r являются постоянными.
 
 \subsection{Модель со скачками цены}
 
@@ -195,7 +225,7 @@
 
 \subsection{Некоторые факты из теории вероятностей}
 
-Для удобства дальнейшего изложения приведём несколько определений, опираясь в частности на метидичку Ширяева\textsuperscript{\cite{bib:Shiryaev_Bulynski}}.
+Для удобства дальнейшего изложения приведём несколько определений, опираясь в частности на метидические пособия Ширяева \cite{bib:Shiryaev,bib:Shiryaev_Bulynski}.
 
 \subsubsection{Фильтрация}
 
@@ -655,48 +685,48 @@ e^{-r}\expect*{e^{\xi U(1)}} = e^{\xi u}
 Из формулировки первой модели \eqref{eq:model1_definition}, уравнение выше принимает вид:
 
 \begin{equation*}
-e^{-r}\expect*{e^{\xi(u - c + Z(1))}} = e^{\xi u}
+e^{-r}\expect*{e^{\xi(u + c - Z(1))}} = e^{\xi u}
 \end{equation*}
 
 Откуда можно вынести неслучайные составляющие:
 
 \begin{equation*}
-e^{-r - c \xi} \expect*{e^{\xi Z(1)}} = 1
+e^{-r + c \xi} \expect*{e^{-\xi Z(1)}} = 1
 \end{equation*}
 
 Заметим, что математическое ожидание в выражении выше представляет собой производящую функцию моментов обобщенного пуассоновского процесса\textsuperscript{{\ref{def:compound_poisson}}}:
 
 \begin{equation*}
-e^{-r - c \xi} M_{Z(1)}(\xi) = 1
+e^{-r + c \xi} M_{Z(1)}(-\xi) = 1
 \end{equation*}
 
 Теперь прологарифмируем обе части:
 
 \begin{equation*}
-\ln{M_{Z(1)}(\xi)} - r - c\xi = 0
+\ln{M_{Z(1)}(- \xi)} - r + c\xi = 0
 \end{equation*}
 
 И применим результат леммы \ref{thm:thm2_moment_generating_function}:
 
 \begin{equation*}
-\ln{e^{\lambda (M_{Y_1}(\xi) - 1)}} - r - c\xi = 0
+\ln{e^{\lambda (M_{Y_1}(- \xi) - 1)}} - r + c\xi = 0
 \end{equation*}
 
 Раскрыв логарифм, получим:
 
 \begin{equation}\label{eq:thm2_eq2}
-\lambda \left(M_{Y_1}(\xi) - 1\right) - r - c\xi = 0
+\lambda \left(M_{Y_1}(- \xi) - 1\right) - r + c\xi = 0
 \end{equation}
 
-Заметим, что $M_{Y_1}(\xi)$, производящая функция моментов\textsuperscript{{\ref{def:moment_generating_function}}}, нам известна:
+Заметим, что $M_{Y_1}(-\xi)$, производящая функция моментов\textsuperscript{{\ref{def:moment_generating_function}}}, нам известна:
 
 \begin{equation*}
-M_{Y_1}(\xi) = \expect{e^{\xi Y_1}} = \int_{0}^{+\infty} e^{\xi x} p(x) \,dx
+M_{Y_1}(-\xi) = \expect{e^{-\xi Y_1}} = \int_{0}^{+\infty} e^{-\xi x} p(x) \,dx
 \end{equation*}
 
 Подставим производящую функцию моментов скачка в \eqref{eq:thm2_eq2} и получим требуемое:
 \begin{equation*}
-\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi = 0
+\lambda \left(\int_{0}^{+\infty} e^{-\xi x} p(x) \,dx - 1\right) - r + c\xi = 0
 \end{equation*}
 \end{proof}
 
@@ -717,12 +747,13 @@ M_{Y_1}(\xi) = \expect{e^{\xi Y_1}} = \int_{0}^{+\infty} e^{\xi x} p(x) \,dx
 Рассмотрим вторую производную данной функции:
 \begin{equation*}
 \begin{split}
-     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] &= \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x \,dx \right) - c \right] =\\
-     = \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{\xi x} x^2}
+     \pdv[2]{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{-\xi x} p(x) \,dx - 1\right) - r + c\xi \right] =\\
+     = \pdv{}{\xi} \left[\lambda \left(\int_{0}^{+\infty} e^{-\xi x} p(x) x \,dx \right) + c \right] =\\
+     = \lambda \left(\int_{0}^{+\infty} e^{-\xi x} p(x) x^{2} \,dx \right) &= \lambda \expect*{e^{-\xi x} x^2}
 \end{split}
 \end{equation*}
 
-Так как $\lambda > 0$, $x^2 \ge 0$, $e^{\xi x} > 0$, $p(x > 0) \neq 0$, выражение $\lambda \expect*{e^{\xi x} x^2}$ строго положительно, как произведение положительной величины и математического ожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна.
+Так как $\lambda > 0$, $x^2 \ge 0$, $e^{-\xi x} > 0$, $p(x > 0) \neq 0$, выражение $\lambda \expect*{e^{-\xi x} x^2}$ строго положительно, как произведение положительной величины и математического ожидания ненулевой неотрицательной случайной величины. Итак, вторая производная исходной функции строго положительна.
 
 \end{proof}
 
@@ -730,12 +761,12 @@ M_{Y_1}(\xi) = \expect{e^{\xi Y_1}} = \int_{0}^{+\infty} e^{\xi x} p(x) \,dx
 \begin{lemma}[О числе решений уравнения \eqref{eq:martingale_cond_for_xi_log}]\label{thm:solution_for_mart_cond_m1}
 Уравнение \eqref{eq:martingale_cond_for_xi_log} имеет ровно два решения. \\
 Первое: $\xi_1 = 1$, \\
-Второе: $\xi_2 = -R < 0$, для некоторого $R > 0$
+Второе: $\xi_2 = R > 0$, для некоторого $R$
 \end{lemma}
 \begin{proof}
 Обозначим функцию в левой части уравнения \eqref{eq:martingale_cond_for_xi_log} через $f(\xi)$:
 \begin{equation*}
-f(\xi) = \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi
+f(\xi) = \lambda \left(\int_{0}^{+\infty} e^{-\xi x} p(x) \,dx - 1\right) - r + c\xi
 \end{equation*}
 
 Так как ${e^{-rt} S(T), t \ge 0}$ является мартингалом и в то же время является частным случаем процесса  $\{e^{-rt}S(t)^{\xi}\}$ при $\xi_1 = 1$, естественным образом получаем первое решение.
@@ -748,89 +779,85 @@ f(0) = \lambda \left(\int_{0}^{+\infty} e^{0} p(x) \,dx - 1\right) - r = \lambda
 
 \begin{equation*}
 \begin{split}
-\lim_{\xi\to-\infty} f(\xi) &= \lim_{\xi\to-\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{\xi x} p(x) \,dx - 1\right) - r - c\xi \right] =\\
-= - \lambda - r - c \xi &= +\infty
+\lim_{\xi\to+\infty} f(\xi) &= \lim_{\xi\to+\infty} \left[ \lambda \left(\int_{0}^{+\infty} e^{- \xi x} p(x) \,dx - 1\right) - r + c\xi \right] =\\
+= - \lambda - r + c \xi &= +\infty
 \end{split}
 \end{equation*}
 
-А так как выражение в левой части --- непрерывная функция от $\xi$, она принимает все значения лежащие в $[min(f(\xi)), +\infty)$ на $\xi \in (-\infty, 0]$ по теореме Больцано-Коши о промежуточном значении. Т.к. $min(f(\xi)) < 0$ (минимум достигается, причём не в $\xi = 1$, то есть $min(f(\xi)) < 0$), значит второе пересечение происходит в отрицательной полуоси: $\xi_2 = -R < 0$, для некоторого $R > 0$
+А так как выражение в левой части --- непрерывная функция от $\xi$, она принимает все значения лежащие в $[min(f(\xi)), +\infty)$ на $\xi \in [0, +\infty)$ по теореме Больцано-Коши о промежуточном значении. Т.к. $min(f(\xi)) < 0$ (минимум достигается, причём не в $\xi = 1$, то есть $min(f(\xi)) < 0$), значит второе пересечение происходит в положительной полуоси: $\xi_2 = R > 0$, для некоторого $R$
 \end{proof}
 
-Отметим, что для положительного мартингала $\{e^{-rt} S(t)^{-R}\}$ ограниченности нет, т.к. можно выбрать $S(t) < L$ и $S(t)$ сколь угодно малым. Поэтому справедлива только оценка:
+Отметим, что для положительного мартингала $\{e^{-rt} S(t)^{R}\}$ существует ограниченность сверху:
+
+\begin{gather*}
+    S(t) < L \\
+    S(t)^{R} < L^R
+\end{gather*}
+
+Поэтому справедлива точная оценка по теореме о преобразовании свободного выбора:
 
 \begin{equation*}
-    \expect*{e^{-r T_L} | S(0) = s} \le \left(\frac{s}{L}\right)^{-R}
+    \expect*{e^{-r T_L} S(T_L)^R | S(0) = s} = s^R
 \end{equation*}
 
-Именно это математическое ожидания используется в формуле \eqref{eq:strategy_c1} для стоимости стратегии $T_L$, которую в данной статье мы обозначаем $V(s; L)$. В итоге получаем:
+Учитывая $S(T_L) = L$:
+
+\begin{equation*}
+    \expect*{e^{-r T_L} S(T_L)^R | S(0) = s} = \expect*{e^{-r T_L} | S(0) = s} L^R
+\end{equation*}
+
+В результате имеем:
+
+\begin{equation*}
+    \expect*{e^{-r T_L} | S(0) = s} = \left(\frac{s}{L}\right)^{R}
+\end{equation*}
+
+Именно это математическое ожидание используется в формуле \eqref{eq:strategy_c1} для стоимости стратегии $T_L$, которую в данной статье мы обозначаем $V(s; L)$. В итоге получаем:
 
 \begin{equation}\label{eq:strategy_c1_simplified}
-V(s; L) \le \left(\frac{L}{s}\right)^{R} \Pi(L), s \le L.
+V(s; L) = \left(\frac{s}{L}\right)^{R} \Pi(L), s \le L.
 \end{equation}
 
-Итак, нам удалось ограничить стоимость опциона сверху. Заметим, что если максимизировать обе части, то получим:
-
-\begin{equation}\label{eq:strategy_c1_maximized}
-\max\limits_{L} V(s; L) \le \max\limits_{L} \left(\frac{L}{s}\right)^{R} \Pi(L), s \le L.
-\end{equation}
-
-Осталось найти $\widetilde{L}$, то есть значение $L$, максимизирующее $V(s; L)$. Отметим, что $s^{-R}$ есть некоторая константа, не зависящая от $L$. На деле нам нужно максимизировать $L^{R} \Pi(L)$. Тогда условие первого порядка (теорема Ферма) имеет вид:
+Итак, нам удалось получить стоимость опциона. Максимизируем её для поиска оптимального порога. Вспомнив функцию $\Pi(S)$ по \eqref{eq:payoff_function}:
 
 \begin{equation*}
-    \pdv{L^{R} \Pi(L)}{L} = R L^{R - 1} \Pi(L) + L^R \Pi'(L) = 0
+\max\limits_{L} V(s; L) = \max\limits_{L} \left(\frac{s}{L}\right)^{R} (L - K), s \le L.
 \end{equation*}
+
+Осталось найти $\widetilde{L}$, то есть значение $L$, максимизирующее $V(s; L)$. Отметим, что $s^{R}$ есть некоторая константа, не зависящая от $L$. На деле нам нужно максимизировать $\frac{L - K}{L^R}$. Тогда условие первого порядка (теорема Ферма) имеет вид:
+
+\begin{equation*}
+    \pdv{}{L} \frac{L - K}{L^R} = \pdv{}{L} \frac{L^R - R L^R + R K L^{R-1}}{L^{2R}} = \pdv{}{L} \frac{(1 - R)L^R + R K L^{R-1}}{L^{2R}} = 0
+\end{equation*}
+
+После упрощения имеем:
+
+\begin{equation*}
+    (1 - R) L = - R K
+\end{equation*}
+
+Значит, формула для $\tilde{L}$:
+
 \begin{equation}\label{eq:first_order_rule_m1}
-    \frac{R}{\widetilde{L}} \Pi(\widetilde{L}) + \Pi'(\widetilde{L}) = 0
+    \tilde{L} = \frac{R}{1 - R} K
 \end{equation}
 
-Более того, можно получить интересный результат, рассмотрев частную производную \eqref{eq:strategy_c1_simplified} по $s$:
+А стоимость опциона из \eqref{eq:strategy_c1_simplified}:
 
 \begin{equation*}
-    \pdv{V(s; L)}{s} = \pdv{(L^R) \Pi(L) s^{-R}}{s} = -\frac{R}{s} L^R \Pi(L) s^{-R}
+    \begin{cases}
+       \left(\frac{s}{\widetilde{L}}\right)^{R} \Pi(\widetilde{L}), \text{ при } s \le \widetilde{L}\\
+      \Pi(s), \text{ при } s > \widetilde{L}
+    \end{cases}\,.
 \end{equation*}
 
-В подстановке $(\widetilde{L}, \widetilde{L})$:
+Или:
 
-\begin{equation*}
-    \pdv{V(s; \widetilde{L})}{s}\at[\big]{s=\widetilde{L}} = -\frac{R}{\widetilde{L}} (\widetilde{L})^R \Pi(\widetilde{L}) (\widetilde{L})^{-R} = -\frac{R}{\widetilde{L}} \Pi(\widetilde{L})
-\end{equation*}
-
-Используя условие оптимальности \eqref{eq:first_order_rule_m1} можно увидеть, что:
-
-\begin{equation}\label{eq:smooth_pasting_condition_m1}
-    \pdv{V(s; \widetilde{L})}{s}\at[\big]{s=\widetilde{L}} = -\frac{R}{\widetilde{L}} \Pi(\widetilde{L}) = \Pi'(\widetilde{L})
-\end{equation}
-
-Это означает, что функции $\Pi(s), s \ge \widetilde{L}$ и $V(s; \widetilde{L}), s \le \widetilde{L}$, имеют гладкое соединение в точке $s = \widetilde{L}$. Этот тип условия оптимальности также называется \textit{гладким сшиванием} или \textit{условием высокого контакта}.
-
-Уточним этот результат с учётом \eqref{eq:payoff_function}:
-
-\begin{equation*}
-    -\frac{R}{\widetilde{L}} (\widetilde{L} - K) = 1
-\end{equation*}
-
-Домножим обе части на $\tilde{L} > 0$:
-
-\begin{equation*}
-    R K = \widetilde{L} (R + 1)
-\end{equation*}
-
-Получаем строгую формулу для оптимального $\tilde{L}$:
-
-\begin{equation}\label{eq:model1_tilde_l}
-    \widetilde{L} =  \frac{R K}{R + 1}
-\end{equation}
-
-Значит, вспоминая \eqref{eq:strategy_c1_maximized}:
-
-\begin{equation*}
-V(s; L) \le \left(\frac{R K}{s (R + 1)}\right)^{R} (\frac{R K - (R + 1) K}{(R + 1)}), s \le L.
-\end{equation*}
-
-Итак:
-
-\begin{equation}\label{eq:strategy_c1_estimation}
-V(s; L) \le \left(\frac{R K}{s (R + 1)}\right)^{R} \left(\frac{R K - (R + 1) K}{R + 1}\right), s \le L.
+\begin{equation}\label{eq:option_price_m1}
+    \begin{cases}
+       \left(\frac{s}{\widetilde{L}}\right)^{R} (\widetilde{L} - K)_{+}, \text{ при } s \le \widetilde{L}\\
+      s - K, \text{ при } s > \widetilde{L}
+    \end{cases}\,.
 \end{equation}
 
 В следующем разделе представлен основной вклад этой статьи, оценивающий бессрочные опционы на активы, цены на которые могут перескакивать через оптимальную границу опциона-исполнения.
@@ -862,11 +889,11 @@ V(s; L) \le \left(\frac{R K}{s (R + 1)}\right)^{R} \left(\frac{R K - (R + 1) K}{
 процесс $\{e^{-rt + \xi U(t)}\}$ был мартингалом. В модели \rom{2} это приводит к условию:
 
 \begin{equation}\label{eq:martingale_condition_for_mod2}
-    \lambda \left[ \int_{0}^{+\infty} e^{-\xi x} p(x) dx - 1 \right] - r + c \xi = 0
+    \lambda \left[ \int_{0}^{+\infty} e^{\xi x} p(x) dx - 1 \right] - r + c \xi = 0
 \end{equation}
 
 Подобно \eqref{eq:martingale_cond_for_xi_log}, это уравнение имеет не более двух решений. Одно из них: $\xi_1 = 1$ (так как $\{e^{-rt} S(t)\}$ - мартингал).
-При некоторых дополнительных условиях регулярности для плотности $p(x)$ уравнение имеет другое, отрицательное решение, $\xi_2 = -R < 0$.
+При некоторых дополнительных условиях регулярности для плотности $p(x)$ уравнение имеет другое, положительное решение, $\xi_2 = R > 0$.
 
 Вспомним, что в нашем случае моменты остановки ограничены:
 
@@ -874,102 +901,138 @@ V(s; L) \le \left(\frac{R K}{s (R + 1)}\right)^{R} \left(\frac{R K - (R + 1) K}{
     T_L < \infty
 \end{equation*}
 
-Тогда может быть применена теорема о преобразовании свободного выбора\textsuperscript{\ref{thm:OptSamplTheorem}}, которая дает:
+Также отметим, что положительный мартингал $\{ e^{-r t} S(t)^R \}$ ограничен сверху при $t < T_L$:
+
 \begin{equation*}
-    \expect*{e^{-rT_L} S(T_L)^{-R} | S(0) = s} \le s^{-R}
+    e^{-r t} S(t)^R < S(t)^R < L^R
 \end{equation*}
+
+Тогда может быть применена теорема о преобразовании свободного выбора\textsuperscript{\ref{thm:OptSamplTheorem}}, которая дает:
+\begin{equation}\label{eq:opt_sampl_applied_to_model2}
+    \expect*{e^{-rT_L} S(T_L)^{R} | S(0) = s} = s^{R}
+\end{equation}
 
 Но теперь проблема в том, что $S(T_L) < L$ и что
 распределение $S(T_L)$ вообще говоря неизвестно.
 
 \subsection{Численный расчёт}
 
-Определим численно для экспоненциального, гамма и логнормального уравнений решения уравнения \eqref{eq:martingale_condition_for_mod2}
+Определим численно для экспоненциального, гамма и логнормального уравнений решения уравнения \eqref{eq:martingale_condition_for_mod2}.
 
-\begin{lstlisting}
-// solve.py
-from scipy.optimize import fsolve
-from scipy.integrate import quad
-from sympy.stats import Gamma, density
-from sympy import Symbol
-import numpy as np
-import math
+Рассмотрим подробнее интеграл в левой части этого уравнения:
 
-def generate_equations(density_f, lambd, r, c):
-    def equations(p):
-        integral = quad(lambda x: np.exp(-p * x) * density_f(x), 0, np.inf)
-        return lambd * (integral[0] - 1) - r + c * p
+\begin{equation*}
+    \int_{0}^{+\infty} e^{\xi x} p(x) dx
+\end{equation*}
 
-    return equations
+Очевидно, что данный интеграл --- ни что иное, как производящая функция моментов $(\expect{e^{t X}})$. Для всех распределений сохраним постоянным математическое ожидание, обозначив его через $\mu$.
 
-def get_gamma(k, theta):
-    X = Gamma("x", k, theta)
-    gamVar = density(X)
-    def get_gamma_helper(symbol):
-        return gamVar(symbol)
-    
-    return get_gamma_helper
+\subsubsection{Лог-нормальное распределение}
 
-def get_gamma_val(k, theta, val):
-    symbol = Symbol("z")
-    return get_gamma(k, theta)(symbol).evalf(subs = {symbol : val})
-    
-def get_exponential(lmbd):
-    X = Exponential("x", lmbd)
-    gamVar = density(X)
-    def get_gamma_helper(symbol):
-        return gamVar(symbol)
-    
-    return get_gamma_helper
+Для лог-нормального распределения данный интеграл расходится и нет возможности применить численный метод
 
-def get_exponential_val(lmbd, val):
-    symbol = Symbol("z")
-    return get_exponential(lmbd)(symbol).evalf(subs = {symbol : val})
-    
-def lognorm(self,x,mu=0,sigma=1):
-   a = (math.log(x) - mu)/math.sqrt(2*sigma**2)
-   p = 0.5 + 0.5*math.erf(a)
-   return p
-   
-def solve_eq(density_f, lambd, r, c, x0):
-    return fsolve(
-        generate_equations(
-            density_f,
-            lambd,
-            r,
-            c
-        ),
-        x0
-    )
-\end{lstlisting}
+\subsubsection{Гамма-распределение}
 
-Теперь, чтобы решить уравнение, достаточно запустить \textit{solve\_eq} с параметрами
+Для гамма-распределения, плотность распределения имеет вид:
 
+\begin{equation}
+    p(x) = \frac{1}{\Gamma(k) \theta^k} x^{k - 1} e^{-\frac{x}{\theta}},
+\end{equation}
+
+где $\Gamma (k) = (k - 1)!, \forall k \in \mathbb{N}$.
+
+Производящая функция для гамма-распределения определена и имеет вид:
+
+\begin{equation}
+    MGF = \expect{e^{t x}} = (1 - \theta t)^{-k}, t < \frac{1}{\theta}
+\end{equation}
+
+Тогда наше уравнение \eqref{eq:martingale_condition_for_mod2} принимает вид:
+
+\begin{equation*}
+    \lambda \left[ (1 - \theta \xi)^{-k} - 1 \right] - r + c \xi = 0
+\end{equation*}
+
+С учётом фиксированного $\mu$ и формулы для математического ожидания гамма-распределения $\expect X = k \theta$:
+
+\begin{equation*}
+    \lambda \left[ \left(1 - \frac{\mu \xi}{k}\right)^{-k} - 1 \right] - r + c \xi = 0
+\end{equation*}
+
+\subsubsection{Экспоненциальное распределение}
+
+Для экспоненциального распределения, плотность распределения имеет вид:
+
+\begin{equation}
+    p(x) = \frac{1}{\beta},
+\end{equation}
+
+Производящая функция для экспоненциального распределения определена и имеет вид:
+
+\begin{equation}
+    MGF = \expect{e^{t x}} = \frac{\beta}{\beta - t}, t < \beta
+\end{equation}
+
+Тогда наше уравнение \eqref{eq:martingale_condition_for_mod2} принимает вид:
+
+\begin{equation*}
+    \lambda \left[ \frac{\beta}{\beta - \xi} - 1 \right] - r + c \xi = 0
+\end{equation*}
+
+С учётом фиксированного $\mu$ и формулы для математического ожидания экспоненциального распределения $\expect X = \frac{1}{\lambda}$:
+
+\begin{equation*}
+    \lambda \left[ \frac{1}{1 - \xi \mu} - 1 \right] - r + c \xi = 0
+\end{equation*}
+
+\subsubsection{Результаты}
+
+Сравним полученные результаты при запуске кода \ref{code:martingale_root} на разных значениях $\mu$. При этом $r = 10^{-2}$ и $c = 10^{-3}$ и поддерживались постоянными при всех опытах. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\rowcolor[rgb]{0.776,0.325,0.325} {\cellcolor[rgb]{0.875,0.624,0.624}}$\mu$ & $\xi_{gam}$                                    & $\xi_{exp}$                               \\
+1000                                                                       & \textcolor[rgb]{0.129,0.129,0.129}{9.52e-05} & \textcolor[rgb]{0.129,0.129,0.129}{9.09e-05}  \\
+500                                                                        & \textcolor[rgb]{0.129,0.129,0.129}{0.00019}  & \textcolor[rgb]{0.129,0.129,0.129}{0.00018}   \\
+100                                                                        & \textcolor[rgb]{0.129,0.129,0.129}{0.00095}  & \textcolor[rgb]{0.129,0.129,0.129}{0.00091}   \\
+50                                                                         & \textcolor[rgb]{0.129,0.129,0.129}{0.00189}  & \textcolor[rgb]{0.129,0.129,0.129}{0.00181}   \\
+10                                                                         & \textcolor[rgb]{0.129,0.129,0.129}{0.00908}  & \textcolor[rgb]{0.129,0.129,0.129}{0.00908}   \\
+5                                                                          & \textcolor[rgb]{0.129,0.129,0.129}{0.01732}  & \textcolor[rgb]{0.129,0.129,0.129}{0.01815}   \\
+1                                                                          & \textcolor[rgb]{0.129,0.129,0.129}{0.06}     & \textcolor[rgb]{0.129,0.129,0.129}{0.09}      \\
+0.5                                                                        & \textcolor[rgb]{0.129,0.129,0.129}{0.08}     & 0.18                                          \\
+0.25                                                                       & \textcolor[rgb]{0.129,0.129,0.129}{0.09771}  & \textcolor[rgb]{0.129,0.129,0.129}{0.35196}   \\
+0.125                                                                      & \textcolor[rgb]{0.129,0.129,0.129}{0.0999}   & \textcolor[rgb]{0.129,0.129,0.129}{0.6819}    \\
+0.05                                                                       & \textcolor[rgb]{0.129,0.129,0.129}{1.5571}   & \textcolor[rgb]{0.129,0.129,0.129}{0.1}      
+\end{tabular}
+\end{table}
+
+При этом стоит отметить, что при увеличении среднего значения, степень мартингала сходится к единому значению, отличаясь при $\mu = 1000$ лишь во 2 порядке точности. Это можно связать с тем, что при увеличении среднего значения вклад производящей функции моментов всё меньше, с другой стороны, и интересность решения численной задачи теряется.
 
 \subsection{Экспоненциальный случай}
 
 Примечательным исключением является случай, при котором величины скачка имеют экспоненциальное распределение, то есть $p(x) = \beta e^{-\beta x}$ для $x > 0$. Это распределение является распределением без памяти\textsuperscript{{\ref{def:memoryless_distr}}}, т.к. оно экспоненциальное.
 
-\begin{theorem}
-Случайная величина $Y=ln(L) - U(T_L)$ при условии $Y \ge 0$ и фиксированном $a = ln(L) - U(T_L^{-}) < 0$ имеет то же экспоненциальное распределение, что и величина скачка $X_{T_L}=U(T_L^{-})-U(T_L)$. Здесь и далее $U(T_L^{-})$ --- момент непосредственно перед скачком.
+\begin{theorem}\label{thm:jump_distribution_is_same}
+Случайная величина $Y=U(T_L) - \ln L$ при условии $Y \ge 0$ и фиксированном $a = U(T_L^{-}) - \ln L < 0$ имеет то же экспоненциальное распределение, что и величина скачка $X_{T_L}=U(T_L) - U(T_L^{-})$. Здесь и далее $U(T_L^{-})$ --- момент непосредственно перед скачком.
 \end{theorem}
 \begin{proof}
 Заметим, что:
 \begin{equation*}
-    Y = ln(L) - U(T_L) = ln(L) - U(T_L^{-}) + U(T_L^{-}) - U(T_L) = a + X(T_L)
+    Y = U(T_L) - \ln L = U(T_L) - U(T_L^{-}) + U(T_L^{-}) - \ln L = X(T_L) + a
 \end{equation*}
 
 Значит:
 \begin{equation}\label{eq:y_distro_from_jump_proof}
-    \mathbb{P}(Y > x \text{ | } S(T_L) < L) = \mathbb{P}(X(T_L) > x - a \text{ | } S(T_L) < L)
+    \mathbb{P}(Y > x \text{ | } S(T_L) > L) = \mathbb{P}(X(T_L) > x - a \text{ | } S(T_L) > L)
 \end{equation}
 
-Рассмотрим условие $S(T_L) < L$ подробнее:
+Рассмотрим условие $S(T_L) > L$ подробнее:
 \begin{gather*}
-    S(T_L) < L \\
-    U(T_L) < Ln L \\
-    X(T_L) = U(T_L^{-}) - U(T_L) > -ln L + U(T_L^{-}) \\
-    X(T_L) > - ln L + U(T_L^{-})
+    S(T_L) > L \\
+    U(T_L) > \ln L \\
+    X(T_L) = U(T_L) - U(T_L^{-}) > \ln L - U(T_L^{-}) \\
+    X(T_L) > \ln L - U(T_L^{-})
 \end{gather*}
 
 Воспользовавшись выражением для $a$:
@@ -997,28 +1060,71 @@ def solve_eq(density_f, lambd, r, c, x0):
 
 \end{proof}
 
-Из этого следует, что:
+
+
+Выразим теперь $S(T_L)$ через величину "перескока" через порог, обозначаемого через $Y$:
+
+\begin{gather*}
+    S(T_L) = e^{U(T_L)} \\
+    S(T_L) = e^{(Y + \ln L)} \\
+    S(T_L) = L e^Y
+\end{gather*}
+
+Подставим данное выражение для $S(T_L)$ в левую часть \eqref{eq:opt_sampl_applied_to_model2}:
+
+\begin{equation*}
+    \expect*{e^{-rT_L} (S(T_L))^{R} | S(0) = s} = \expect*{e^{-rT_L} (L e^Y)^{R} | S(0) = s}
+\end{equation*}
+
+Так как величина "перескока" и момент остановки $T_L$ независимы, можем записать 
+\begin{equation*}
+    \expect*{e^{-rT_L} (L e^Y)^{R} | S(0) = s} = \expect*{e^{-rT_L} | S(0) = s} \expect*{(L e^Y)^{R}}
+\end{equation*}
+
+Из этого и теоремы \ref{thm:jump_distribution_is_same} следует, что:
 
 \begin{equation*}
 \begin{split}
-    s^{-R} = \expect*{e^{-rT_L} | S(0) = s} \beta \int_{0}^{+\infty} (L e^{-x})^{-R} e^{-\beta x} dx &= \\
-    = \expect*{e^{-rT_L} | S(0) = s} L^{-R} \frac{\beta}{\beta - R}
+    s^{R} = \expect*{e^{-rT_L} | S(0) = s} \expect*{(L e^Y)^{R}} &= \\
+    = \expect*{e^{-rT_L} | S(0) = s} \int_{0}^{+\infty} \beta (L e^{x})^{R} e^{-\beta x} dx &= \\
+    = \expect*{e^{-rT_L} | S(0) = s} \beta \int_{0}^{+\infty} (L e^{x})^{R} e^{-\beta x} dx &= \\
+    \expect*{e^{-rT_L} | S(0) = s} L^{R} \beta \int_{0}^{+\infty} e^{(R - \beta) x} dx
 \end{split}
 \end{equation*}
 
-А также тот факт, что:
+Заметим, что интеграл при $R - \beta \ge 0$ расходится, значит имеем в виду, что $R \ge \beta$:
+
+\begin{equation}\label{eq:same_distr_conseq}
+\begin{split}
+    s^{R} = \expect*{e^{-rT_L} | S(0) = s} L^{R} \beta \int_{0}^{+\infty} e^{(R - \beta) x} dx &= \\
+    = \expect*{e^{-rT_L} | S(0) = s} L^{R} \frac {\beta} {R - \beta}
+\end{split}
+\end{equation}
+
+При этом из формулы \eqref{eq:strategy_cost} с учетом теоремы \ref{thm:jump_distribution_is_same} следует:
+
+\begin{equation*}
+    V(s; L) = \expect*{e^{-rT_L} \Pi(S(T_L)) | S(0) = s} = \expect*{e^{-rT_L} \Pi(L e^Y) | S(0) = s}
+\end{equation*}
+
+Так как момент остановки и величина перескока независимы:
 
 \begin{equation*}
 \begin{split}
-    V(s; L) = \expect*{e^{-rT_L} | S(0) = s} \beta \int_{0}^{+\infty} P(L e^{-x}) e^{-\beta x} dx, s \ge L
+    V(s; L) = \expect*{e^{-rT_L} \Pi(L e^Y) | S(0) = s} &= \\
+    = \expect*{e^{-rT_L} | S(0) = s} \expect*{\Pi(L e^Y) | S(0) = s} &= \\
+    = \expect*{e^{-rT_L} | S(0) = s} \beta \int_{0}^{+\infty} \Pi(L e^x) e^{-\beta x} dx
 \end{split}
 \end{equation*}
 
-В конечном итоге, соединяя последние два выражения, получаем, что:
+Учитывая \eqref{eq:same_distr_conseq} и факт выше в конечном итоге получаем, что:
 
 \begin{equation}\label{eq:strategy_price_m2}
 \begin{split}
-    V(s; L) = (\beta - R) (\frac{L}{s})^R \int_{0}^{+\infty} P(L e^{-x}) e^{-\beta x} dx
+    V(s; L) = \expect*{e^{-rT_L} | S(0) = s} \beta \int_{0}^{+\infty} \Pi(L e^x) e^{-\beta x} dx &= \\
+    = \left( \frac{s}{L} \right)^R \frac{R - \beta}{\beta} \beta \int_{0}^{+\infty} \Pi(L e^x) e^{-\beta x} dx &= \\
+    = \left( \frac{s}{L} \right)^R (R - \beta) \int_{0}^{+\infty} \Pi(L e^x) e^{-\beta x} dx &= \\
+    = s^R (R - \beta) \cdot L^{-R} \int_{0}^{+\infty} \Pi(L e^x) e^{-\beta x} dx
 \end{split}
 \end{equation}
 
@@ -1027,169 +1133,302 @@ def solve_eq(density_f, lambd, r, c, x0):
 \textbf{Один} из них заключается в том, что $\tilde{L}$ должно максимизировать выражение:
 
 \begin{equation*}
-L^R \int_{0}^{\infty} P(L e^{-x}) e^{-\beta x} dx
+L^{-R} \int_{0}^{\infty} \Pi(L e^{x}) e^{-\beta x} dx
 \end{equation*}
 
-Найдём производную данного выражения
+По принципу Ферма возьмём производную функции:
 
 \begin{equation*}
 \begin{split}
-    \frac{\partial}{\partial L} \left[L^R \int_{0}^{\infty} P(L e^{-x}) e^{-\beta x} dx\right] &=\\
-    = R L^{R-1}  \int_{0}^{\infty} P(L e^{-x}) e^{-\beta x} dx + L^R \int_{0}^{\infty} P'(L e^{-x}) e^{-x} e^{-\beta x} dx
+    \frac{\partial}{\partial L} \left[ L^{-R} \int_{0}^{\infty} \Pi(L e^{x}) e^{-\beta x} dx \right] &=\\
+    = -R L^{-R-1}  \int_{0}^{\infty} \Pi(L e^{x}) e^{-\beta x} dx + L^{-R} \int_{0}^{\infty} \pdv{}{L} \Pi(L e^{x}) e^{x} e^{-\beta x} dx
 \end{split}
 \end{equation*}
 
 Тогда условие стационарности в $\tilde{L}$ приводит к условию первого порядка:
 
 \begin{equation}\label{eq:model2_first_idea_cond}
-    \frac{R}{\tilde{L}} \int_{0}^{\infty} P(\tilde{L} e^{-x}) e^{-\beta x} dx + \int_{0}^{\infty} P'(\tilde{L} e^{-x}) e^{-x} e^{-\beta x} dx = 0
+    \frac{-R}{\tilde{L}} \int_{0}^{\infty} \Pi(\tilde{L} e^{x}) e^{-\beta x} dx + \int_{0}^{\infty} \pdv{}{\tilde{L}} \Pi(\tilde{L} e^{x}) e^{(1 - \beta) x} dx = 0
 \end{equation}
 
 \textbf{Второй} заключается в том, что мы должны иметь:
 
 \begin{equation}\label{eq:model2_second_idea_state}
-    V(\tilde{L}; \tilde{L}) = P(\tilde{L})
+    V(\tilde{L}; \tilde{L}) = \Pi(\tilde{L})
 \end{equation}
 
-Выполнение этого равенства означало бы, что функции $P(s), s \le \tilde{L}$ и $V(s; \tilde{L}), s \ge \tilde{L}$ имеют непрерывное соединение в точке $s = \tilde{L}$. Уравнение \eqref{eq:model2_second_idea_state} при подстановке в \eqref{eq:strategy_price_m2} приводит к условию:
+Выполнение этого равенства означало бы, что функции $\Pi(s), s \le \tilde{L}$ и $V(s; \tilde{L}), s \ge \tilde{L}$ имеют непрерывное соединение в точке $s = \tilde{L}$. Уравнение \eqref{eq:model2_second_idea_state} при подстановке в \eqref{eq:strategy_price_m2} приводит к условию:
 
 \begin{equation}\label{eq:model2_second_idea_cond}
-    V(\tilde{L}; \tilde{L}) = (\beta - R) \int_{0}^{+\infty} P(\tilde{L} e^{-x}) e^{-\beta x} dx = P(\tilde{L})
+\begin{split}
+    V(\tilde{L}, \tilde{L}) = (\tilde{L})^R (R - \beta) (\tilde{L})^{-R} \int_{0}^{+\infty} \Pi((\tilde{L}) e^x) e^{-\beta x} dx &=\\
+    = (R - \beta) \int_{0}^{+\infty} \Pi((\tilde{L}) e^x) e^{-\beta x} dx = \Pi(\tilde{L})
+\end{split}
 \end{equation}
 
 Проведём \textbf{связь} между этими подходами. Интегрируя второй интеграл в \eqref{eq:model2_first_idea_cond} по частям, мы получим эквивалентность условий первого и второго подхода.
 
 Условие непрерывного соединения может иметь следующее обоснование. Если $L$ --- таково, что $V(L; L) < P(L)$, мы делаем вывод, что $\tilde{L} > L$. Если, в обратном случае $L$ таково, что $V(L; L) > P(L)$, мы понимаем, что $\tilde{L} < L$. Таким образом мы мы показали, что $\tilde{L}$ должно удовлетворять \eqref{eq:model2_second_idea_state}. Также заметим, что это обоснование не учитывает ограничение на тот факт, что размер скачка имеет экспоненциальное распределение, а значит оно верно и в общем случае.
 
-Таким образом, $\tilde{L}$ должно удовлетворять условию непрерывного соединения в общем случае, что будет покрыто и обосновано в следующем разделе.
+Таким образом, $\tilde{L}$ должно удовлетворять условию непрерывного соединения в общем случае. Для нашего же случая, когда $\Pi(S)$ --- известная функция, можно найти решение строго:
 
-\subsubsection{Поиск оптимального порога для экспоненциальной модели}
+Из \eqref{eq:model2_first_idea_cond} и \eqref{eq:payoff_function}:
 
-Воспользуемся условием \eqref{eq:model2_second_idea_cond}:
+\begin{equation}\label{}
+    - \frac{R}{\tilde{L}} \int_{0}^{\infty} \left((\tilde{L} e^{x} - K)_{+}\right) e^{-\beta x} dx + \int_{0}^{\infty} \pdv{(\tilde{L} e^{x} - K)_{+}}{\tilde{L}} e^{(1 - \beta) x} dx = 0
+\end{equation}
 
-\begin{equation*}
-    (\beta - R) \int_{0}^{+\infty} P(\tilde{L} e^{-x}) e^{-\beta x} dx = P(\tilde{L})
-\end{equation*}
+Так как всюду, где $x < \ln K - \ln L$ платёжная функция равна $0$:
 
-Рассмотрим подробнее левую часть уравнения. В ней используется функция $P(s)$, которая равна 0 всюду, где $K \ge s$. А значит, выражение под интегралом нетривиально только когда $\tilde{L} e^{-x} > K$. Найдём значения $x$, при которых это выполняется:
+\begin{equation}
+\begin{split}
+    - \frac{R}{\tilde{L}} \int\limits_{\ln K - \ln L}^{\infty} \left((\tilde{L} e^{x} - K)\right) e^{-\beta x} dx + \int\limits_{\ln K - \ln L}^{\infty} \pdv{(\tilde{L} e^{x} - K)} {\tilde{L}} e^{(1 - \beta) x} dx &= \\
+    = - \frac{R}{\tilde{L}} \int\limits_{\ln K - \ln L}^{\infty} \left((\tilde{L} e^{x} - K)\right) e^{-\beta x} dx + \int\limits_{\ln K - \ln L}^{\infty} e^{x} e^{(1 - \beta) x} dx &= \\
+    = - \frac{R}{\tilde{L}} \int\limits_{\ln K - \ln L}^{\infty} \tilde{L} e^{(1 - \beta) x} dx - \frac{R K}{\tilde{L}} \int\limits_{\ln K - \ln L}^{\infty} e^{-\beta x} dx + \int\limits_{\ln K - \ln L}^{\infty} e^{(2 - \beta) x} dx &= \\
+    = - \frac{R L e^{(1 - \beta) x}}{\tilde{L} (1 - \beta)}\bigg|_{\ln K - \ln L}^{\infty} + \frac{R K e^{-\beta x}}{\tilde{L} \beta}\bigg|_{\ln K - \ln L}^{\infty} - \frac{e^{(2 - \beta) x}}{2 - \beta}\bigg|_{\ln K - \ln L}^{\infty}
+\end{split}
+\end{equation}
 
-\begin{gather*} 
-K - \tilde{L} e^{-x} \le 0 \\ 
-\tilde{L} e^{-x} \ge K \\
-e^{-x} \ge \frac{K}{\tilde{L}} \\
--x \ge ln(K) - ln(\tilde{L}) \\
-x \le ln(\tilde{L}) - ln(K)
-\end{gather*}
+Примем во внимание факт, что при $\beta < 2$ хотя бы один из интегралов расходится. При $\beta \ge 2$ несколько точек, а именно $\beta = 0$, $\beta = 1$, $\beta = 2$ не допускаются, т.к. дроби при них не определены
 
-Тогда можем упростить интеграл:
+\subsubsection{Оптимальный порог при $\beta > 2$}
 
 \begin{equation*}
 \begin{split}
-    (\beta - R) \int_{0}^{+\infty} P(\tilde{L} e^{-x}) e^{-\beta x} dx = (\beta - R) \int_{ln(\tilde{L}) - ln(K)}^{+\infty} (K - \tilde{L} e^{-x}) e^{-\beta x} dx &= \\
-    = (\beta - R) \left[ - \frac{K e^{-\beta x}}{\beta} \bigg|_{ln(\tilde{L}) - ln(K)}^{+\infty} - \tilde{L} \int_{ln(\tilde{L}) - ln(K)}^{+\infty} e^{-(\beta + 1) x} dx \right] &= \\
-    = (\beta - R) \left[ \frac{K e^{-\beta (ln(\tilde{L}) - ln(K))}}{\beta} + \frac{\tilde{L} e^{-(\beta + 1) x}}{\beta + 1} \bigg|_{ln(\tilde{L}) - ln(K)}^{+\infty} \right] &= \\
-    = (\beta - R) \left[ \frac{K e^{-\beta (ln(\tilde{L}) - ln(K))}}{\beta} - \frac{\tilde{L} e^{-(\beta + 1) (ln(\tilde{L}) - ln(K))}}{\beta + 1} \right] %&= \\
-    %= (\beta - R) e^{-\beta (ln(\tilde{L}) - ln(K))} \left[ \frac{K}{\beta} - \frac{\tilde{L} e^{-(ln(\tilde{L}) - ln(K))}}{\beta + 1} \right]
+    - \frac{R L e^{(1 - \beta) x}}{\tilde{L} (1 - \beta)}\bigg|_{\ln K - \ln L}^{\infty} + \frac{R K e^{-\beta x}}{\tilde{L} \beta}\bigg|_{\ln K - \ln L}^{\infty} - \frac{e^{(2 - \beta) x}}{2 - \beta}\bigg|_{\ln K - \ln L}^{\infty} &= \\
+    = \frac{R L e^{(1 - \beta) (\ln K - \ln L)}}{\tilde{L} (1 - \beta)} - \frac{R K e^{-\beta (\ln K - \ln L)}}{\tilde{L} \beta} + \frac{e^{(2 - \beta) (\ln K - \ln L)}}{2 - \beta} &= \\
+    = \frac{R \left(\frac{K}{\tilde{L}}\right)^{(1 - \beta)}}{(1 - \beta)} - \frac{R K \left(\frac{K}{\tilde{L}}\right)^{-\beta}}{\tilde{L} \beta} + \frac{\left(\frac{K}{\tilde{L}}\right)^{(2 - \beta)}}{2 - \beta} = 0
 \end{split}
 \end{equation*}
 
-Для удобства сделаем замену $a = e^{(ln(\tilde{L}) - ln(K))}$:
-\begin{equation*}
-    \begin{split}
-        (\beta - R) \left[ \frac{K e^{-\beta (ln(\tilde{L}) - ln(K))}}{\beta} - \frac{\tilde{L} e^{-(\beta + 1) (ln(\tilde{L}) - ln(K))}}{\beta + 1} \right] &= \\
-        = (\beta - R) \left[ \frac{K a^{-\beta}}{\beta} - \frac{\tilde{L} a^{-(\beta + 1)}}{\beta + 1} \right]
-    \end{split}
-\end{equation*}
-
-Данное выражение равно 0, если $\tilde{L} \ge K$ и равно $K - \tilde{L}$ иначе:
-
-\begin{subnumcases}{V(\tilde{L}, \tilde{L})=}
-   K - \tilde{L} & $\tilde{L} < K$ \label{eq:exponential_optimal_boundary_search_positive_case}
-   \\
-   0 & $\tilde{L} \ge K$ \label{eq:exponential_optimal_boundary_search_null_case}
-\end{subnumcases}
-
-Рассмотрим сначала \eqref{eq:exponential_optimal_boundary_search_null_case}:
+Домножив обе части на $\left(\frac{K}{\tilde{L}}\right)^{\beta}$:
 
 \begin{equation*}
-    (\beta - R) \left[ \frac{K a^{-\beta}}{\beta} - \frac{\tilde{L} a^{-(\beta + 1)}}{\beta + 1} \right] = 0
+    \frac{R \left(\frac{K}{\tilde{L}}\right)}{(1 - \beta)} - \frac{R K}{\tilde{L} \beta} + \frac{\left(\frac{K}{\tilde{L}}\right)^2}{2 - \beta} = 0
 \end{equation*}
 
-Значит:
+Обозначим за $x = \frac{K}{\tilde{L}}$:
 
 \begin{equation*}
-    \frac{K}{\beta} = \frac{\tilde{L} a^{-1}}{\beta + 1}
+     \frac{x^2}{2 - \beta} + \frac{R x}{(1 - \beta)} - \frac{R x}{\beta} = 0
 \end{equation*}
 
-Тогда:
+Так как $x \neq 0$:
 
 \begin{equation*}
-    a = \frac{\tilde{L}}{K} \frac{\beta}{\beta + 1}
+     x = (2 - \beta) \left(\frac{R}{\beta} - \frac{R}{(1 - \beta)}\right) = \frac{(1 - 2 \beta) (2 - \beta) R}{\beta (1 - \beta)}
 \end{equation*}
 
-Вспомним, что $a = \frac{\tilde{L}}{K}$. Значит, получаем $\beta = \beta + 1$. Это невозможно, что приводит нас к выводу, что и оптимальный порог, больший $K$ также невозможен.
-
-Тогда рассмотрим \eqref{eq:exponential_optimal_boundary_search_positive_case}:
+В результате получаем оптимальный порог для экспоненциальной модели:
 
 \begin{equation*}
-    (\beta - R) \left[ \frac{K a^{-\beta}}{\beta} - \frac{\tilde{L} a^{-(\beta + 1)}}{\beta + 1} \right] = 
-    (\beta - R) a^{-\beta} \left[ \frac{K}{\beta} - \frac{\tilde{L} a^{-1}}{\beta + 1} \right] = K - \tilde{L}
+    \tilde{L} = \frac{\beta (1 - \beta) K}{(1 - 2 \beta) (2 - \beta) R}
 \end{equation*}
 
-Преобразуем к более читаемому виду:
+А стоимость опциона из \eqref{eq:strategy_price_m2}:
 
 \begin{equation*}
-    \frac{a K}{\beta} - \frac{\tilde{L}}{\beta + 1} = \frac{K - \tilde{L}}{\beta - R} a^{\beta + 1}
+\begin{cases}
+    \left(\frac{s}{\widetilde{L}}\right)^R (R - \beta) \int_{0}^{+\infty} \Pi(L e^x) e^{-\beta x} dx, \text{ при } s \le \widetilde{L}\\
+    \Pi(s), \text{ при } s > \widetilde{L}
+\end{cases}\,.
 \end{equation*}
 
-Стоит учесть, что $a = \frac{\tilde{L}}{K}$, а значит имеем:
+Напомним, что опцион определён только для $\beta > 2$ и учтём формулу \eqref{eq:payoff_function}:
 
 \begin{equation*}
-    \frac{\tilde{L}}{\beta} - \frac{\tilde{L}}{\beta + 1} = \left( \frac{K - \tilde{L}}{\beta - R} \right) \left( \frac{\tilde{L}}{K} \right)^{\beta + 1}
+\begin{cases}
+    \left(\frac{s}{\widetilde{L}}\right)^R (R - \beta) \frac{K^{(1-\beta)}}{\beta (\beta - 1) L^{\beta}}, \text{ при } s \le \widetilde{L}\\
+    s - K, \text{ при } s > \widetilde{L}
+\end{cases}\,.
 \end{equation*}
 
-Или:
+Упростив получим стоимость опциона для экспоненциально распределённых скачков вверх, то есть модели \rom{2}:
 
-\begin{equation*}
-    \frac{\tilde{L}}{\beta (\beta + 1)} = \left( \frac{K - \tilde{L}}{\beta - R} \right) \left( \frac{\tilde{L}}{K} \right)^{\beta + 1}
-\end{equation*}
-
-Приведя всё к степенному уравнению:
-
-\begin{equation*}
-    \frac{a^{\beta + 1}}{\beta - R} - \frac{a^{\beta}}{\beta - R} + \frac{1}{\beta (\beta + 1)} = 0
-\end{equation*}
+\begin{equation}\label{eq:option_price_m2_exp}
+\begin{cases}
+    \frac{s^R K^{1 - \beta} (R - \beta)}{L^{R + \beta} \beta (\beta - 1)}, \text{ при } s \le \widetilde{L}\\
+    s - K, \text{ при } s > \widetilde{L}
+\end{cases}\,.
+\end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% Заключение %%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Заключение}
 
+В этой статье рассматривается оценка бессрочных опционов, когда базовая акция следует смещенному сложному пуассоновскому процессу. В данной работе были рассмотрены две модели стоимости актива - со скачками вверх и со скачками вниз. В статье содержатся некоторые элегантные результаты.
+
+В теории ценообразования опционов часто предполагается, что цена акции или фондового индекса следует геометрическому броуновскому движению. Оценка опциона, опирающегося на акцию или фондовый индекс, включает в себя анализ броуновского движения, который требует хорошего знания теории стохастических процессов и стохастического исчисления. С другой стороны, в актуарной науке долгое время применяли теорию распределения для моделирования страховых рисков и в результате распределения и преобразования широко используются и известны. Однако общая теория случайных процессов и стохастическое исчислением представляются более сложными. Мартингальный подход Гербера и Шиу позволяет нам решать некоторые проблемы ценообразования опционов, со сравнительно простым набором математических инструментов. Кроме того, это мощный инструмент для вычисления различных распределений времени столкновения с барьером геометрического броуновского движения. 
+
+Как мы увидели, мартингальный подход обеспечивает простой аналитический метод без детального знания стохастического исчисления в отличие от классического метода.
+
+Также были получены интересные и неожиданные результаты для экспоненциального распределения - вид функции стоимости опциона был разительно разным для двух моделей, что показало несимметричность модели со скачком вниз и модели со скачками вверх.
+
+Исследование численных решений для гамма и экспоненциального распределений показали интересные разные степени для риск-нейтральных мартингалов, что результировало бы в ощутимо разные функции для стоимостей опционов.
+
+Интересным продолжением данной работы могло бы стать исследование результатов для барьерных опционов с использованием данных моделей, а также гибридной модели, комбинирующей в себе и броуновское движение и модель со скачками, как модель \rom{1}* \cite{bib:GerberShiu}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% Литература %%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Сопутствующая литература}
 
-\begin{thebibliography}{3}
+\begin{thebibliography}{10}
 \bibitem{bib:GerberShiu}
-Hans U. Gerber and Elias S.W. Shiu \textbf{"Pricing Perpetual Options for Jump Processes"} // --- North American Actuarial Journal, 1998 --- vol. 2, issue 3, 108-109 ---
+Gerber H.U., Shiu E.S.W. Pricing Perpetual Options for Jump Processes // North American Actuarial Journal --- 1998  v. 2, --- P. 108---109
+
+\bibitem{bib:GARCH}
+Bollerslev T. Generalized autoregressive conditional heteroskedasticity // Journal of Econometrics --- 1986  v. 31, --- P. 307---327
+
 \bibitem{bib:Shiryaev}
-А. Н. Ширяев, \textbf{"О мартингальных методах в задачах о пересечении границ броуновским движением"} // --- Совр. пробл. матем., 2007 --- выпуск 8, 3–78 ---
+Ширяев А.Н. О мартингальных методах в задачах о пересечении границ броуновским движением // Совр. пробл. матем. --- 2007 в. 8, --- с. 3–--78
+
 \bibitem{bib:Shiryaev_Bulynski}
-А.В.Булинский, А.Н.Ширяев., \textbf{"Теория случайных процессов"} // --- Физматлит, 2006 --- выпуск 8, 3–78 ---
+Булинский А.В,, Ширяев А.Н., "Теория случайных процессов // Физматлит --- 2006 в. 8, --- с. 3–--78
+
 \bibitem{bib:Black_Scholes}
-Fischer Black, Myron Scholes, \textbf{"The Pricing of Options and Corporate Liabilities"} // --- The Journal of Political Economy, 1973 --- выпуск 3, 637-654 ---
+Black F., Scholes M. The Pricing of Options and Corporate Liabilities // The Journal of Political Economy --- 1973 v. 3, --- P. 637---654
+
 \bibitem{bib:GerberShiu_Esscher}
-Hans U. Gerber and Elias S.W. Shiu \textbf{"Option pricing by Esscher transforms"} // --- TRANSACTIONS OF SOCIETY OF ACTUARIES, 1994 --- vol. 46, 99-191 ---
+Gerber H.U., Shiu E.S.W. Option pricing by Esscher transforms // Transactions of society of actuaries --- 1994 v. 46, --- P. 99---191
+
 \bibitem{bib:GerberShiu_Actuarial_1}
-Hans U. Gerber and Elias S.W. Shiu \textbf{"An Actuarial Bridge
-to Option Pricing 
-"} // --- Securitization of Insurance Risk: The 1995 Bowles Symposium ---
+Gerber H.U., Shiu E.S.W. An Actuarial Bridge
+to Option Pricing // Securitization of Insurance Risk: The 1995 Bowles Symposium
+
 \bibitem{bib:GerberShiu_Actuarial_2}
-Hans U. Gerber and Elias S.W. Shiu \textbf{"Actuarial Approach to Option Pricing"} // --- Proceedings AFIR, 1995 ---
+Gerber H.U., Shiu E.S.W. Actuarial Approach to Option Pricing // Proceedings AFIR --- 1995
+
 \bibitem{bib:GerberShiu_Actuarial_3}
-Hans U. Gerber and Elias S.W. Shiu \textbf{"From Ruin Theory to Option Pricing"} // --- Actuarial Approach to financial risks, 1998 ---
+Gerber H.U., Shiu E.S.W. From Ruin Theory to Option Pricing // Actuarial Approach to financial risks --- 1998
+
+\bibitem{bib:Perpetual_Mart1}
+Gerber H.U., Shiu E .S. W. Martingale approach to pricing perpetual Аmеrican options on two stocks // Mathematical Finance --- 1996 v. 6, --- P. 303---322.
+\bibitem{bib:Perpetual_Mart2}
+Gerber H.U., Shiu E .S. W. Martingale approach to pricing perpetual Аmerican options // A STIN Bulletin. --- 1994. v. 24. --- P. 195---200.
+
+\bibitem{bib:Musiela1997}
+Musiela M., Rutkowski M. Modifications of the Black-Scholes Model // Springer Berlin Heidelberg. --- 1997 --- P. 135---158.
+
+\bibitem{bib:BSModification}
+Lin X., Wang M. A modification term for Black-Scholes model based on discrepancy calibrated with real market data // Data Science in Finance and Economics. --- 2021 --- P. 313---326.
+
 \end{thebibliography}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% Приложение %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\section{Код}
+
+Задача поиска степени мартингала:\label{code:martingale_root}
+
+\begin{lstlisting}
+// solve.py
+
+# Numeric solution to martingale condition
+
+import math
+
+import numpy as np
+from matplotlib import pyplot as plt
+from scipy.integrate import quad
+from scipy.optimize import minimize
+
+plt.rcParams["figure.figsize"] = [7.50, 3.50]
+plt.rcParams["figure.autolayout"] = True
+
+LAMBDA = 1e-1
+R = 1e-2
+C = 1e-3
+MEAN = 0.9
+
+# Generate equations for each distribution with relating parameters
+def gen_gamma_eq(lmbd, r, c, theta, k):
+    def gamma_eq(p):
+        return lmbd * ((1 - theta * p) ** (-k) - 1) - r + c * p
+
+    return gamma_eq
+
+
+def gen_exp_eq(lmbd, r, c, beta):
+    def exp_eq(p):
+        return lmbd * ((beta) / (beta - p) - 1) - r + c * p
+
+    return exp_eq
+
+
+def solve_gamma(k=10):
+    theta = MEAN / k
+    eq = gen_gamma_eq(
+        LAMBDA,
+        R,
+        C,
+        k,
+        theta,
+    )
+    t = minimize(
+        lambda x: abs(eq(x)),
+        -1,
+        method="Nelder-Mead",
+        constraints={"type": "ineq", "fun": lambda x: (1 - theta * x)},
+        options={"xtol": 1e-10, "ftol": 1e-10, "maxiter": 1000},
+    )
+
+    assert t.x[0] < 1 / theta
+    return t.x[0]
+
+
+def plot_gamma(k=10):
+    theta = MEAN / k
+    eq = gen_gamma_eq(
+        LAMBDA,
+        R,
+        C,
+        k,
+        theta,
+    )
+
+    x = np.linspace(-0.5, 0.5, 10000)
+    plt.plot(x, eq(x), color="red")
+    plt.show()
+
+
+def solve_exp():
+    beta = 1 / MEAN
+    eq = gen_exp_eq(
+        LAMBDA,
+        R,
+        C,
+        beta,
+    )
+    t = minimize(
+        lambda x: abs(eq(x)),
+        -1,
+        constraints={"type": "ineq", "fun": lambda x: beta - x},
+        options={"xtol": 1e-10, "ftol": 1e-10, "maxiter": 1000},
+    )
+    assert t.x[0] < beta
+    return t.x[0]
+
+
+def plot_exp():
+    beta = 1 / MEAN
+    eq = gen_exp_eq(
+        LAMBDA,
+        R,
+        C,
+        beta,
+    )
+    x = np.linspace(-1, 1, 10000)
+    new_eq = lambda x: np.nan if (abs(x - beta) < 1e-3) else eq(x)
+
+    plt.plot(x, list(map(new_eq, x)), color="red")
+    plt.show()
+
+
+\end{lstlisting}
 
 \end{document}
